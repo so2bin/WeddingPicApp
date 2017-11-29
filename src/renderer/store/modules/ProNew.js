@@ -1,14 +1,14 @@
 const state = {
-    ruleForm: ruleForm,
-    signForm: {},
-    shareForm: {},
-    selfForm: {},
-    activeList:data
+  signForm: {},
+  shareForm: {},
+  selfForm: {},
 }
 
+const mutations = {
 
+}
 
-export default  new Vuex.Store({
-    state,
-    mutations
-})
+export default{
+  state,
+  mutations
+}

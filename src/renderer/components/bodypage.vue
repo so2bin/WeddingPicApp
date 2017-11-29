@@ -4,7 +4,7 @@
     <div class="pic-show">
         <el-row style="height:200px;">
             <el-col style="line-height:18px;"
-            :span="8" v-for="(obj, index) in datas" :key="obj" :offset="index > 0 ? 2 : 0">
+            :span="10" v-for="(obj, index) in datas" :key="obj" :offset="index > 0 ? 2 : 0">
                 <el-card :body-style="{ padding: '0px' }">
                     <img :src="obj.imgUrl" class="image">
                     <div style="padding: 14px;">
@@ -23,15 +23,15 @@
 
 <script lang="">
 export default {
-    data() {
-        return {
-            currentDate: new Date(),
-            datas: [
-                {imgUrl: "http://www.twgreatdaily.com/imgs/image/105/10588367.jpg"},
-                {imgUrl: "http://www.twgreatdaily.com/imgs/image/105/10588367.jpg"},
-            ]
-        };
+  data () {
+    return {
+      currentDate: new Date(),
+      datas: [
+        {imgUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'},
+        {imgUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'}
+      ]
     }
+  }
 }
 </script>
 

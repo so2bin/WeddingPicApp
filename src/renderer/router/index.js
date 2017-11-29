@@ -15,15 +15,15 @@ export default new Router({
       name: 'pronew',
       component: require('@/components/pro-new').default,
       children: [
-          {
-              path: '', component: require('@/components/pro-new/step1').default,
-          },
-          {
-              path: 'step1', component: require('@/components/pro-new/step1').default,
-          },
-          {
-              path: 'step2', component: require('@/components/pro-new/step2').default,
-          },
+        {
+          path: '', component: require('@/components/pro-new/step1').default
+        },
+        {
+          path: 'step1', component: require('@/components/pro-new/step1').default
+        },
+        {
+          path: 'step2', component: require('@/components/pro-new/step2').default
+        }
       ]
     },
     {

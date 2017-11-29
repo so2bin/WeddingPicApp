@@ -1,11 +1,11 @@
 <template lang="">
 <div class="pro-new">
     <!-- 步骤组件 -->
-    <el-steps :space="200" :active="step" class="step">
-        <el-step title="活动信息" description=""></el-step>
-        <el-step title="报名签到" description=""></el-step>
-        <el-step title="分享设置" description=""></el-step>
-        <el-step title="个性设置" description=""></el-step>
+    <el-steps :space="150" :active="step" :align-center="true" class="step">
+        <el-step title="步骤一" description=""></el-step>
+        <el-step title="步骤二" description=""></el-step>
+        <el-step title="步骤三" description=""></el-step>
+        <el-step title="步骤四" description=""></el-step>
     </el-steps>
 
     <!-- 视图 -->
@@ -27,79 +27,79 @@
 <script lang="">
 import $ from 'jquery'
 export default {
-    name: 'pro-new',
-    data: function() {
-        return {
-            isRouter: false,
-            preview: true,
-            preStep: false,
-            nextStep: true,
-            publish: false,
-            step: 1
-        }
-    },
-    methods: {
-        handlePreview: function() {
-            console.log('预览');
-        },
-        handlePreStep: function() {
-            this.$router.go(-1);
-            this.step--;
-            this.goStep(this.step);
-            $('html,body').animate({
-                scrollTop: 0
-            }, 500);
-        },
-        handleNextStep: function() {
-            this.$router.push('/pro-new/step' + (this.step + 1));
-            var _this = this;
-            setTimeout(function() {
-                if (_this.isRouter) {
-                    _this.step++;
-                    _this.goStep(_this.step);
-                }
-            })
-            $('html,body').animate({
-                scrollTop: 0
-            }, 500);
-        },
-        handlePublish: function() {
-            console.log('发布');
-        },
-        goStep: function(n) {
-            switch (n) {
-                case 1:
-                    this.preview = true;
-                    this.preStep = false;
-                    this.nextStep = true;
-                    this.publish = false;
-                    break;
-                case 2:
-                    this.preview = false;
-                    this.preStep = true;
-                    this.nextStep = true;
-                    this.publish = false;
-                    break;
-                case 3:
-                    this.preview = false;
-                    this.preStep = true;
-                    this.nextStep = true;
-                    this.publish = false;
-                    break;
-                case 4:
-                    this.preview = false;
-                    this.preStep = true;
-                    this.nextStep = false;
-                    this.publish = true;
-                    break;
-            }
-        }
-    },
-    watch: {
-        '$route': function(to, from) {
-            this.isRouter = true;
-        }
+  name: 'pro-new',
+  data: function () {
+    return {
+      isRouter: false,
+      preview: true,
+      preStep: false,
+      nextStep: true,
+      publish: false,
+      step: 1
     }
+  },
+  methods: {
+    handlePreview: function () {
+      console.log('预览')
+    },
+    handlePreStep: function () {
+      this.$router.go(-1)
+      this.step--
+      this.goStep(this.step)
+      $('html,body').animate({
+        scrollTop: 0
+      }, 500)
+    },
+    handleNextStep: function () {
+      this.$router.push('/pro-new/step' + (this.step + 1))
+      var _this = this
+      setTimeout(function () {
+        if (_this.isRouter) {
+          _this.step++
+          _this.goStep(_this.step)
+        }
+      })
+      $('html,body').animate({
+        scrollTop: 0
+      }, 500)
+    },
+    handlePublish: function () {
+      console.log('发布')
+    },
+    goStep: function (n) {
+      switch (n) {
+        case 1:
+          this.preview = true
+          this.preStep = false
+          this.nextStep = true
+          this.publish = false
+          break
+        case 2:
+          this.preview = false
+          this.preStep = true
+          this.nextStep = true
+          this.publish = false
+          break
+        case 3:
+          this.preview = false
+          this.preStep = true
+          this.nextStep = true
+          this.publish = false
+          break
+        case 4:
+          this.preview = false
+          this.preStep = true
+          this.nextStep = false
+          this.publish = true
+          break
+      }
+    }
+  },
+  watch: {
+    '$route': function (to, from) {
+      this.isRouter = true
+    }
+  }
 }
 </script>
 

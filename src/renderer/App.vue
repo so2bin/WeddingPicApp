@@ -22,15 +22,15 @@ import bodypage from './components/bodypage.vue'
 import headpage from './components/header.vue'
 
 export default {
-    name: 'weddingapp',
-    components: {
-        sidepage,
-        bodypage,
-        headpage
-    },
-    data() {
-        return {}
-    }
+  name: 'weddingapp',
+  components: {
+    sidepage,
+    bodypage,
+    headpage
+  },
+  data () {
+    return {}
+  }
 }
 </script>
 
@@ -57,7 +57,7 @@ export default {
     background-color: #E9EEF3;
     color: #333;
     text-align: center;
-    line-height: 160px;
+    /*line-height: 160px;*/
 }
 
 body>.el-container {

@@ -12,7 +12,6 @@ export default new Router({
     },
     {
       path: '/pronew',
-      name: 'pronew',
       component: require('@/components/pro-new').default,
       children: [
         {

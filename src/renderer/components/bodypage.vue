@@ -3,8 +3,7 @@
     <h2 class="help-title">朝歌婚姻相册系统<span style="font-size:16px;">v1.0</span></h2>
     <div class="pic-show">
         <el-row style="height:200px;">
-            <el-col style="line-height:18px;"
-            :span="10" v-for="(obj, index) in datas" :key="obj" :offset="index > 0 ? 2 : 0">
+            <el-col style="line-height:18px;" :span="10" v-for="(obj, index) in datalist" :key="obj" :offset="index > 0 ? 2 : 0">
                 <el-card :body-style="{ padding: '0px' }">
                     <img :src="obj.imgUrl" class="image">
                     <div style="padding: 14px;">
@@ -26,7 +25,7 @@ export default {
   data () {
     return {
       currentDate: new Date(),
-      datas: [
+      datalist: [
         {imgUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'},
         {imgUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'}
       ]

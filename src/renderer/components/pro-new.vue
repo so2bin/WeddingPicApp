@@ -19,8 +19,6 @@
         <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary">下一步</el-button>
         <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary">发布活动</el-button>
     </div>
-
-    作者：拯救地球一号 链接：http://www.jianshu.com/p/0a7aef90d0e8 來源：简书 著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 </div>
 </template>
 
@@ -51,7 +49,7 @@ export default {
       }, 500)
     },
     handleNextStep: function () {
-      this.$router.push('/pro-new/step' + (this.step + 1))
+      this.$router.push('/pronew/step' + (this.step + 1))
       var _this = this
       setTimeout(function () {
         if (_this.isRouter) {

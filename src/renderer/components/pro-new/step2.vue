@@ -6,7 +6,7 @@
                 <img :src="origImg" alt="" @load="origImgLoaded" id="origImg">
             </div>
             <div class="processed-img">
-                <img :src="processedImg" alt="">
+                <img :src="processedImg" alt="" id="processedImg">
             </div>
         </el-main>
         <el-aside class="step2-aside" width="37%">
@@ -22,23 +22,29 @@
 <script lang="">
 import fx from 'glfx'
 export default {
-    data() {
-        return {
-            bOrigImgLoaded: false,
-            pro_name: "",
-            origImg: "http://evanw.github.io/glfx.js/media/image.jpg",
-            processedImg: "",
-        }
-    },
-    methods: {
-        origImgLoaded() {
-            this.bOrigImgLoaded = true
-            var canvas = fx.canvas();
-            console.log('origin image loaded!')
-            var origImage = document.getElementById('origImg');
-            var texture = canvas.texture(origImage);
-        }
+  data () {
+    return {
+      bOrigImgLoaded: false,
+      pro_name: '',
+      origImg: 'http://evanw.github.io/glfx.js/media/image.jpg',
+      processedImg: ''
     }
+  },
+  methods: {
+    //  http://www.cnblogs.com/ajg016/p/5477557.html  跨域
+    origImgLoaded () {
+      this.bOrigImgLoaded = true
+      var canvas = fx.canvas()
+      console.log('origin image loaded!')
+      var origImage = document.getElementById('origImg')
+      var texture = canvas.texture(origImage)
+      canvas.draw(texture).ink(0.25).update();
+      var processedImage = document.getElementById('processedImg')
+      // processedImage.parentNode.insertBefore(canvas, processedImage);
+      // processedImage.parentNode.removeChild(image);
+      processedImage.src = canvas.toDataURL('image/png');
+    }
+  }
 }
 </script>
 

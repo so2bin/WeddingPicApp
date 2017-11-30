@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, BrowserWindow } from 'electron'
+import { app, BrowserWindow, Menu } from 'electron'
 
 /**
  * Set `__static` path to static files in production
@@ -22,10 +22,13 @@ function createWindow () {
   mainWindow = new BrowserWindow({
     height: 563,
     useContentSize: true,
-    width: 1000
+    width: 1000,
+    webPreferences:{webSecurity: false} //加上这个就可以获取到了本地的图片
   })
 
   mainWindow.loadURL(winURL)
+  // close Menu
+  Menu.setApplicationMenu(null)
 
   mainWindow.on('closed', () => {
     mainWindow = null

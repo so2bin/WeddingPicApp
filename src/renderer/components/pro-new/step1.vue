@@ -28,22 +28,22 @@
 
 <script lang="">
 export default {
-    data() {
-        return {
-            sel_val: null,
-            pro_name: '',
-            options: [{
-                    label: "规格一",
-                    value: 1
-                },
-                {
-                    label: "规格二",
-                    value: 2
-                }
-            ],
-            bInsertQRCode: '1',
-        }
+  data () {
+    return {
+      sel_val: null,
+      pro_name: '',
+      options: [{
+        label: '规格一',
+        value: 1
+      },
+      {
+        label: '规格二',
+        value: 2
+      }
+      ],
+      bInsertQRCode: '1'
     }
+  }
 }
 </script>
 

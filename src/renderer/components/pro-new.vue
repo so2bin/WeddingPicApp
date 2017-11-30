@@ -17,7 +17,7 @@
         <el-button @click.native.prevent="handlePreview" v-show="preview">预览</el-button>
         <el-button @click.native.prevent="handlePreStep" v-show="preStep">上一步</el-button>
         <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary">下一步</el-button>
-        <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary">发布活动</el-button>
+        <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary">发布</el-button>
     </div>
 </div>
 </template>

@@ -1,7 +1,7 @@
 const state = {
   signForm: {},
   shareForm: {},
-  selfForm: {},
+  selfForm: {}
 }
 
 const mutations = {

@@ -40,6 +40,9 @@ export default {
     line-height:80px;
     margin:0 0px;
 }
+.pic-show{
+    height: 490px;
+}
 
 .time {
     font-size: 13px;

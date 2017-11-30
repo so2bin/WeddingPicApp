@@ -1,6 +1,6 @@
 <template>
 <div id="app">
-    <el-container style="height: 600px;">
+    <el-container style="height: 100%;">
         <el-aside width="120px">
             <sidepage></sidepage>
         </el-aside>

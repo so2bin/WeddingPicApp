@@ -22,6 +22,18 @@ export default new Router({
         },
         {
           path: 'step2', component: require('@/components/pro-new/step2').default
+        },
+        {
+          path: 'step3', component: require('@/components/pro-new/step3').default
+        },
+        {
+          path: 'step4', component: require('@/components/pro-new/step4').default
+        },
+        {
+          path: 'step5', component: require('@/components/pro-new/step5').default
+        },
+        {
+          path: 'step6', component: require('@/components/pro-new/step6').default
         }
       ]
     },

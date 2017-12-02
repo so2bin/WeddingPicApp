@@ -3,7 +3,12 @@
     <el-container class="step2-container">
       <el-container>
         <el-main class="step2-main">
-          <wxindex></wxindex>
+          <div class="wxpic wxpic-left">
+            <wxindexLeft :bkimg="img1Path"></wxindexLeft>
+          </div>
+          <div class="wxpic wxpic-right">
+            <wxindexRight :bkimg="img2Path"></wxindexRight>
+          </div>
         </el-main>
         <el-footer style="line-height:24px; height:68px;">
           <div class="img-input text-overflow" style="padding-top:3px; padding-bottom:0px;">
@@ -58,11 +63,16 @@
 </template>
 
 <script lang="">
-import wxindex from './wx-template/wx-index.vue'
+import wxindexLeft from './wx-template/wx-index-left.vue'
+import wxindexRight from './wx-template/wx-index-right.vue'
+import {mapState} from 'vuex';
+
 export default {
   components:{
-    wxindex
+    wxindexLeft,
+    wxindexRight
   },
+  props: ['bkimg'],
   data () {
     return {
       bkImg1: null,
@@ -70,21 +80,20 @@ export default {
       pro_author:"",
       pro_phone:"",
       pro_company:"",
-      img1Path:"",
-      img2Path: ""
     }
   },
-  computed: {
-
-  },
+  computed: mapState({
+    img1Path: state=>state.ProNew.step3.img1Path,
+    img2Path: state=>state.ProNew.step3.img2Path,
+  }),
   methods: {
     select_back_img(type) {
       let img = event.currentTarget.files[0]
       console.log(img.path)
       if(type === 1){
-        this.img1Path = img.path
+        this.$store.commit('set_step3_backimg', {img1: img.path})
       }else{
-        this.img2Path = img.path
+        this.$store.commit('set_step3_backimg', {img2: img.path})
       }
     }
   }
@@ -108,6 +117,7 @@ export default {
     -webkit-border-radius: 6px;
     height: 100%;
     padding: 10px;
+    /*position: relative;*/
 }
 
 .step2-aside {
@@ -170,5 +180,13 @@ export default {
   width: 60%;
   position: absolute;
   left: 120px;
+}
+.wxpic{
+  height: 97%;
+  width: 45%;
+  display: inline-block;
+}
+.wxpic-left{
+
 }
 </style>

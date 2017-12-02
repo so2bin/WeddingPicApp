@@ -1,4 +1,4 @@
-<template lang="html">
+<template lang="">
   <div class="wx-index">
       <img src="" alt="">
   </div>
@@ -12,8 +12,8 @@ export default {
 
 <style lang="css" scoped>
 .wx-index{
-  height: 100%;
-  width: 40%;
   border: 1px solid;
+  height: 100%;
+  border-color: #d3dce6;
 }
 </style>

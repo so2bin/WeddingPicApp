@@ -1,4 +1,4 @@
-<template lang="html">
+<template lang="">
   <div class="wx-header">
 
   </div>

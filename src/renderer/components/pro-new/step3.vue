@@ -4,32 +4,12 @@
       <el-container>
         <el-main class="step2-main">
           <div class="wxpic wxpic-left">
-            <wxindexLeft :bkimg="img1Path"></wxindexLeft>
+            <wxindexLeft></wxindexLeft>
           </div>
           <div class="wxpic wxpic-right">
-            <wxindexRight :bkimg="img2Path"></wxindexRight>
+            <wxindexRight></wxindexRight>
           </div>
         </el-main>
-        <el-footer style="line-height:24px; height:68px;">
-          <div class="img-input text-overflow" style="padding-top:3px; padding-bottom:0px;">
-            <span>
-              <input type="file" id="fileElem1" accept="image/*" style="display:none" @change="select_back_img(1)">
-              <label for="fileElem1" class='bkImg-btn'>
-                <i class="el-icon-picture"></i>背景一：
-              </label>
-              <input type="text" class="back-img-tips" :value="img1Path"/>
-            </span>
-          </div>
-          <div class="img-input text-overflow" style="padding-top:0px; padding-bottom:3px;">
-            <span>
-              <input type="file" id="fileElem2" accept="image/*" style="display:none" @change="select_back_img(2)">
-              <label for="fileElem2" class='bkImg-btn'>
-                <i class="el-icon-picture"></i>背景二：
-              </label>
-              <input type="text" class="back-img-tips" :value="img2Path"/>
-            </span>
-          </div>
-        </el-footer>
       </el-container>
         <el-aside class="step2-aside" width="37%">
             <div class="step2-row">
@@ -82,21 +62,21 @@ export default {
       pro_company:"",
     }
   },
-  computed: mapState({
-    img1Path: state=>state.ProNew.step3.img1Path,
-    img2Path: state=>state.ProNew.step3.img2Path,
-  }),
-  methods: {
-    select_back_img(type) {
-      let img = event.currentTarget.files[0]
-      console.log(img.path)
-      if(type === 1){
-        this.$store.commit('set_step3_backimg', {img1: img.path})
-      }else{
-        this.$store.commit('set_step3_backimg', {img2: img.path})
-      }
-    }
-  }
+  // computed: mapState({
+  //   img1Path: state=>state.ProNew.step3.img1Path,
+  //   img2Path: state=>state.ProNew.step3.img2Path,
+  // }),
+  // methods: {
+  //   select_back_img(type) {
+  //     let img = event.currentTarget.files[0]
+  //     console.log(img.path)
+  //     if(type === 1){
+  //       this.$store.commit('set_step3_backimg', {img1: img.path})
+  //     }else{
+  //       this.$store.commit('set_step3_backimg', {img2: img.path})
+  //     }
+  //   }
+  // }
 }
 </script>
 
@@ -183,10 +163,11 @@ export default {
 }
 .wxpic{
   height: 97%;
-  width: 45%;
+  width: 47%;
   display: inline-block;
+  vertical-align: middle
 }
 .wxpic-left{
-
+  position: relative;;
 }
 </style>

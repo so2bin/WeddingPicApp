@@ -14,6 +14,16 @@
                 <span class="aside-tips">项目名称：</span>
                 <el-input v-model="pro_name" placeholder="请输入内容" size="small" style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
+              <div class="pic-filter">
+                  <div class="pic-filter-blightness">
+                    <div class="block">
+                      <span class="demonstration">亮度: {{ v_blight }}</span>
+                      <el-slider v-model="val_fltr_blight" @change="filte_bc_img"></el-slider>
+                      <span class="demonstration">对比度: {{ v_contrast }}</span>
+                      <el-slider v-model="val_fltr_contrast" @change="filte_bc_img"></el-slider>
+                    </div>
+                  </div>
+              </div>
         </el-aside>
     </el-container>
 </div>
@@ -27,23 +37,35 @@ export default {
       bOrigImgLoaded: false,
       pro_name: '',
       origImg: 'http://evanw.github.io/glfx.js/media/image.jpg',
-      processedImg: ''
+      processedImg: '',
+      val_fltr_blight: 50,
+      val_fltr_contrast: 50,
     }
+  },
+  computed: {
+      v_blight() { return (this.val_fltr_blight - 50) / 50 },
+      v_contrast() { return (this.val_fltr_contrast - 50) / 50 }
   },
   methods: {
     //  http://www.cnblogs.com/ajg016/p/5477557.html  跨域
-    origImgLoaded () {
-      this.bOrigImgLoaded = true
+    filte_bc_img(val){
       var canvas = fx.canvas()
-      console.log('origin image loaded!')
       var origImage = document.getElementById('origImg')
       var texture = canvas.texture(origImage)
-      canvas.draw(texture).ink(0.25).update();
+      canvas.draw(texture).brightnessContrast(this.v_blight, this.v_contrast).update();
       var processedImage = document.getElementById('processedImg')
       // processedImage.parentNode.insertBefore(canvas, processedImage);
       // processedImage.parentNode.removeChild(image);
       processedImage.src = canvas.toDataURL('image/png');
-    }
+    },
+    origImgLoaded () {
+      this.bOrigImgLoaded = true
+      console.log('origin image loaded!')
+      this.filte_bc_img(0)
+    },
+    formatTooltip(val) {
+        return val / 100;
+    },
   }
 }
 </script>

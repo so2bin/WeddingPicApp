@@ -59,11 +59,17 @@ export default {
   height: 100%;
   width: 100%;
 }
+.bk-img:hover{
+  cursor: pointer;
+  border: 1px solid #0d85ce;
+}
 .bk-img-icon{
   position: absolute;
   left:50%;
   top:50%;
   font-size: 28px;
   z-index: 100;
+  color: #0d85ce;
+  font-weight: 800;
 }
 </style>

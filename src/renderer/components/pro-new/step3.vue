@@ -7,7 +7,7 @@
             <wxindexLeft></wxindexLeft>
           </div>
           <div class="wxpic wxpic-right">
-            <wxindexRight></wxindexRight>
+            <wxindexRight :pro_obj="obj"></wxindexRight>
           </div>
         </el-main>
       </el-container>
@@ -34,7 +34,7 @@
             </div>
             <div class="step2-row">
                 <span class="aside-tips">公司地址：</span>
-                <el-input v-model="pro_company" placeholder="请输入内容" size="small"
+                <el-input v-model="pro_company_addr" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
         </el-aside>
@@ -52,31 +52,71 @@ export default {
     wxindexLeft,
     wxindexRight
   },
-  props: ['bkimg'],
+  props: ['pro_obj'],
   data () {
     return {
       bkImg1: null,
-      pro_title: "",
-      pro_author:"",
-      pro_phone:"",
-      pro_company:"",
     }
   },
-  // computed: mapState({
-  //   img1Path: state=>state.ProNew.step3.img1Path,
-  //   img2Path: state=>state.ProNew.step3.img2Path,
-  // }),
-  // methods: {
-  //   select_back_img(type) {
-  //     let img = event.currentTarget.files[0]
-  //     console.log(img.path)
-  //     if(type === 1){
-  //       this.$store.commit('set_step3_backimg', {img1: img.path})
-  //     }else{
-  //       this.$store.commit('set_step3_backimg', {img2: img.path})
-  //     }
-  //   }
-  // }
+  computed: {
+    obj(){
+      return {
+        pro_title: this.pro_title,
+        pro_author: this.pro_author,
+        pro_phone: this.pro_phone,
+        pro_company: this.pro_company,
+        pro_company_addr: this.pro_company_addr,
+      }
+    },
+    pro_title: {
+      get(){
+        return this.$store.state.ProNew.step3.pro_title
+      },
+      set(val){
+        this.change_pro_info('title', val)
+      }
+    },
+    pro_author: {
+      get(){
+        return this.$store.state.ProNew.step3.pro_author
+      },
+      set(val){
+        this.change_pro_info('author', val)
+      }
+    },
+    pro_phone: {
+      get(){
+        return this.$store.state.ProNew.step3.pro_phone
+      },
+      set(val){
+        this.change_pro_info('phone', val)
+      }
+    },
+    pro_company: {
+      get(){
+        return this.$store.state.ProNew.step3.pro_company
+      },
+      set(val){
+        this.change_pro_info('company', val)
+      }
+    },
+    pro_company_addr: {
+      get(){
+        return this.$store.state.ProNew.step3.pro_company_addr
+      },
+      set(val){
+        this.change_pro_info('company_addr', val)
+      }
+    }
+  },
+  methods: {
+    change_pro_info(type, val){
+      this.$store.commit('set_step3_pro', {type, val})
+    }
+  },
+  watch: {
+
+  }
 }
 </script>
 
@@ -85,11 +125,9 @@ export default {
 .step2 {
     padding: 10px 0px;
 }
-
 .step2-container {
     height: 430px;
 }
-
 .step2-main {
     margin-right: 3px;
     border: 1px solid #A5A060;
@@ -99,7 +137,6 @@ export default {
     padding: 10px;
     /*position: relative;*/
 }
-
 .step2-aside {
     padding: 10px 0px;
     border: 1px solid #A5A060;
@@ -110,19 +147,16 @@ export default {
     -webkit-border-radius: 6px;
     line-height: 36px;
 }
-
 .step2-aside .aside-tips {
     float: left;
     padding-left: 18px;
     font-weight: 600;
 }
-
 .step2-aside .step2-row {
     width: 100%;
     line-height: 36px;
     height: 36px;
 }
-
 .el-footer{
   position: relative;
 }
@@ -144,7 +178,6 @@ export default {
   left: 30px;
   margin-bottom: 0px;
 }
-
 .text-overflow{
   width:31em;
   word-break:keep-all;           /* 不换行 */

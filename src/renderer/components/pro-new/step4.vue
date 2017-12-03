@@ -40,13 +40,21 @@
             <span>打印机列表</span>
           </div>
           <div class="printer-list">
-            
+
           </div>
         </div>
     </div>
 </template>
 
 <script lang="">
+import electron from 'electron'
+
+let ipcRenderer = electron.ipcRenderer
+ipcRenderer.send('printer-list', true)
+console.log('send printer-list true')
+ipcRenderer.on('printer-list', (e, args)=>{
+  console.log('return from main, args:', args)
+})
     export default {
       data(){
         return {

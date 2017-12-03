@@ -1,7 +1,8 @@
 'use strict'
 
-import { app, BrowserWindow, Menu } from 'electron'
-
+import { app, BrowserWindow, Menu, ipcMain } from 'electron'
+let printer = require('printer')
+console.log(printer)
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -33,6 +34,12 @@ function createWindow () {
   mainWindow.on('closed', () => {
     mainWindow = null
   })
+
+  // ipc
+  ipcMain.on('printer-list', (e, arg)=>{
+    console.log('55555', arg)
+  })
+  // console.log(printer.getPrinters())
 }
 
 app.on('ready', createWindow)

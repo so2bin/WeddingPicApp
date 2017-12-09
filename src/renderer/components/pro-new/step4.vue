@@ -48,25 +48,25 @@
 
 <script lang="">
     export default {
-      data(){
+      data () {
         return {
-          originImgPath: "",
-          copyImgPath: "",
-          composedImgPath: ""
+          originImgPath: '',
+          copyImgPath: '',
+          composedImgPath: ''
         }
       },
       methods: {
-        sel_origin_folder(){
+        sel_origin_folder () {
           let trgtId = event.target.id
           let selPath = event.currentTarget.files[0]
-          if(!selPath){
+          if (!selPath) {
             return
           }
-          if(trgtId == 'imgFolderOrigin'){
+          if (trgtId == 'imgFolderOrigin') {
             this.originImgPath = selPath.path
-          }else if(trgtId == 'imgFolderCopy'){
+          } else if (trgtId == 'imgFolderCopy') {
             this.copyImgPath = selPath.path
-          }else if(trgtId == 'imgFolderComposed'){
+          } else if (trgtId == 'imgFolderComposed') {
             this.composedImgPath = selPath.path
           }
         }

@@ -1,6 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, Menu } from 'electron'
+let printer = require('printer')
 
 /**
  * Set `__static` path to static files in production
@@ -23,7 +24,7 @@ function createWindow () {
     height: 563,
     useContentSize: true,
     width: 1000,
-    webPreferences:{webSecurity: false} //加上这个就可以获取到了本地的图片
+    webPreferences: {webSecurity: false} // 加上这个就可以获取到了本地的图片
   })
 
   mainWindow.loadURL(winURL)

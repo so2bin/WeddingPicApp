@@ -39,33 +39,33 @@ export default {
       origImg: 'http://evanw.github.io/glfx.js/media/image.jpg',
       processedImg: '',
       val_fltr_blight: 50,
-      val_fltr_contrast: 50,
+      val_fltr_contrast: 50
     }
   },
   computed: {
-      v_blight() { return (this.val_fltr_blight - 50) / 50 },
-      v_contrast() { return (this.val_fltr_contrast - 50) / 50 }
+    v_blight () { return (this.val_fltr_blight - 50) / 50 },
+    v_contrast () { return (this.val_fltr_contrast - 50) / 50 }
   },
   methods: {
     //  http://www.cnblogs.com/ajg016/p/5477557.html  跨域
-    filte_bc_img(val){
+    filte_bc_img (val) {
       var canvas = fx.canvas()
       var origImage = document.getElementById('origImg')
       var texture = canvas.texture(origImage)
-      canvas.draw(texture).brightnessContrast(this.v_blight, this.v_contrast).update();
+      canvas.draw(texture).brightnessContrast(this.v_blight, this.v_contrast).update()
       var processedImage = document.getElementById('processedImg')
       // processedImage.parentNode.insertBefore(canvas, processedImage);
       // processedImage.parentNode.removeChild(image);
-      processedImage.src = canvas.toDataURL('image/png');
+      processedImage.src = canvas.toDataURL('image/png')
     },
     origImgLoaded () {
       this.bOrigImgLoaded = true
       console.log('origin image loaded!')
       this.filte_bc_img(0)
     },
-    formatTooltip(val) {
-        return val / 100;
-    },
+    formatTooltip (val) {
+      return val / 100
+    }
   }
 }
 </script>

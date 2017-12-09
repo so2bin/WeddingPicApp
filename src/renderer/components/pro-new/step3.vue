@@ -45,72 +45,72 @@
 <script lang="">
 import wxindexLeft from './wx-template/wx-index-left.vue'
 import wxindexRight from './wx-template/wx-index-right.vue'
-import {mapState} from 'vuex';
+import {mapState} from 'vuex'
 
 export default {
-  components:{
+  components: {
     wxindexLeft,
     wxindexRight
   },
   props: ['pro_obj'],
   data () {
     return {
-      bkImg1: null,
+      bkImg1: null
     }
   },
   computed: {
-    obj(){
+    obj () {
       return {
         pro_title: this.pro_title,
         pro_author: this.pro_author,
         pro_phone: this.pro_phone,
         pro_company: this.pro_company,
-        pro_company_addr: this.pro_company_addr,
+        pro_company_addr: this.pro_company_addr
       }
     },
     pro_title: {
-      get(){
+      get () {
         return this.$store.state.ProNew.step3.pro_title
       },
-      set(val){
+      set (val) {
         this.change_pro_info('title', val)
       }
     },
     pro_author: {
-      get(){
+      get () {
         return this.$store.state.ProNew.step3.pro_author
       },
-      set(val){
+      set (val) {
         this.change_pro_info('author', val)
       }
     },
     pro_phone: {
-      get(){
+      get () {
         return this.$store.state.ProNew.step3.pro_phone
       },
-      set(val){
+      set (val) {
         this.change_pro_info('phone', val)
       }
     },
     pro_company: {
-      get(){
+      get () {
         return this.$store.state.ProNew.step3.pro_company
       },
-      set(val){
+      set (val) {
         this.change_pro_info('company', val)
       }
     },
     pro_company_addr: {
-      get(){
+      get () {
         return this.$store.state.ProNew.step3.pro_company_addr
       },
-      set(val){
+      set (val) {
         this.change_pro_info('company_addr', val)
       }
     }
   },
   methods: {
-    change_pro_info(type, val){
+    change_pro_info (type, val) {
       this.$store.commit('set_step3_pro', {type, val})
     }
   },

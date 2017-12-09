@@ -15,26 +15,26 @@ export default {
   components: {
     wxindexHeader
   },
-  data(){
+  data () {
     return {
-      bkimg: "/static/img/背景图片1.jpg",
-      bLoaded: false,
+      bkimg: '/static/img/背景图片1.jpg',
+      bLoaded: false
     }
   },
   computed: {
-    isBkImgLoaded(){
-      return this.bkimg && this.bkimg!=="" && this.bLoaded
-    },
+    isBkImgLoaded () {
+      return this.bkimg && this.bkimg !== '' && this.bLoaded
+    }
   },
   // props: ['bkimg'],
   methods: {
-    sel_bkImg() {
+    sel_bkImg () {
       let img = event.currentTarget.files[0]
       console.log(img.path)
       this.bkimg = img.path
-      if(img.path && img.path!==''){
+      if (img.path && img.path !== '') {
         this.bLoaded = true
-      }else{
+      } else {
         this.bLoaded = false
       }
     }

@@ -40,19 +40,27 @@
             <span>打印机列表</span>
           </div>
           <div class="printer-list">
-            
+            <el-checkbox class="" v-for="(prntr, index) in printerLst" :key="index"
+            @click.native="checked(index)" v-model="checkedLst[index]">
+              {{ prntr }}
+            </el-checkbox>
           </div>
+          <el-button @click.native="gotoPrint" size="mini">自动打印</el-button>
         </div>
     </div>
 </template>
 
 <script lang="">
+import { ipcRenderer } from 'electron'
+
     export default {
       data () {
         return {
           originImgPath: '',
           copyImgPath: '',
-          composedImgPath: ''
+          composedImgPath: '',
+          printerLst: [],
+          checkedLst: []
         }
       },
       methods: {
@@ -69,14 +77,52 @@
           } else if (trgtId == 'imgFolderComposed') {
             this.composedImgPath = selPath.path
           }
+        },
+        checked (index) {
+          this.checkedLst[index] = !this.checkedLst[index]
+        },
+        gotoPrint () {
+          let template = "N\nS4\nD15\nq400\nR\nB20,10,0,1,2,30,173,B,\nP0\n";
+          let printerIdx = [];
+          this.checkedLst.forEach((elem, idx) => {
+            if(elem===true){
+              printerIdx.push(idx);
+            }
+          });
+          let printerName = this.printerLst[printerIdx[0]];
+          console.log('开始打印...')
+          console.log('打印机: ', printerName)
+          console.log('打印内容: ', template)
+          printer.printDirect({
+            data:template.replace(/barcode/, "000"),
+            printer:printerName,
+            type: "RAW",
+            success:function(){
+              console.log("printed: "+barcode_text);
+            },
+            error:function(err){
+              console.error(err);
+            }
+          })
         }
+      },
+      created() {
+        ipcRenderer.send('ipc-printer-list', true);
+        ipcRenderer.on('ipc-printer-list', (event, arg) => {
+          arg.forEach(elem => {
+            // body...
+            this.printerLst.push(elem);
+            this.checkedLst.push(false);
+          });
+        })
       }
     }
 </script>
 
 <style lang="" scoped>
 .step4{
-
+  padding: 10px 0px;
+  height: 430px;
 }
 .step4-main-upper{
   width: 100%;

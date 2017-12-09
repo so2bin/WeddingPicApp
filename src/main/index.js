@@ -1,7 +1,7 @@
 'use strict'
 
 import { app, BrowserWindow, Menu } from 'electron'
-let printer = require('printer')
+let tools = require('../tools')
 
 /**
  * Set `__static` path to static files in production
@@ -30,6 +30,9 @@ function createWindow () {
   mainWindow.loadURL(winURL)
   // close Menu
   Menu.setApplicationMenu(null)
+
+  // self define functions
+  tools.funcs()
 
   mainWindow.on('closed', () => {
     mainWindow = null

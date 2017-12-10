@@ -17,10 +17,10 @@
               <div class="pic-filter">
                   <div class="pic-filter-blightness">
                     <div class="block">
-                      <span class="demonstration">亮度: {{ v_blight }}</span>
-                      <el-slider v-model="val_fltr_blight" @change="filte_bc_img"></el-slider>
-                      <span class="demonstration">对比度: {{ v_contrast }}</span>
-                      <el-slider v-model="val_fltr_contrast" @change="filte_bc_img"></el-slider>
+                      <span id="sliderBlight" class="demonstration">亮度: {{ v_blight }}</span>
+                      <el-slider v-model="val_fltr_blight" @change="change_filter('sliderBlight')"></el-slider>
+                      <span id="sliderContrast" class="demonstration">对比度: {{ v_contrast }}</span>
+                      <el-slider v-model="val_fltr_contrast" @change="change_filter('sliderContrast')"></el-slider>
                     </div>
                   </div>
               </div>
@@ -38,15 +38,35 @@ export default {
       pro_name: '',
       origImg: 'http://evanw.github.io/glfx.js/media/image.jpg',
       processedImg: '',
-      val_fltr_blight: 50,
-      val_fltr_contrast: 50
     }
   },
   computed: {
     v_blight () { return (this.val_fltr_blight - 50) / 50 },
-    v_contrast () { return (this.val_fltr_contrast - 50) / 50 }
+    v_contrast () { return (this.val_fltr_contrast - 50) / 50 },
+    val_fltr_blight: {
+        get() {
+            return this.$store.state.ProNew.step2.val_fltr_blight
+        },
+        set(val) {
+            this.set_filter('blightness', val)
+        }
+    },
+    val_fltr_contrast: {
+        get() {
+            return this.$store.state.ProNew.step2.val_fltr_contrast
+        },
+        set(val) {
+            this.set_filter('contrast', val)
+        }
+    },
   },
   methods: {
+    change_filter (trgtId) {
+        this.filte_bc_img();
+    },
+    set_filter(type, val){
+        this.$store.commit('set_step2_filter', {type, val})
+    },
     //  http://www.cnblogs.com/ajg016/p/5477557.html  跨域
     filte_bc_img (val) {
       var canvas = fx.canvas()

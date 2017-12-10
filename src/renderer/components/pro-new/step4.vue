@@ -6,8 +6,8 @@
               原始目录：
             </span>
             <input type="file" id="imgFolderOrigin" webkitdirectory directory  style="display:none"
-             @change="sel_origin_folder">
-            <input type="text" name="" value="" :value="originImgPath">
+             @change="change_folder">
+            <input type="text" name="" value="" :value="imgfldr_origin">
             <label for="imgFolderOrigin">
               <img src="/static/img/icons/folder.svg" alt="">
             </label>
@@ -17,8 +17,8 @@
               备份目录：
             </span>
             <input type="file" id="imgFolderCopy" webkitdirectory directory  style="display:none"
-             @change="sel_origin_folder">
-            <input type="text" name="" value="" :value="copyImgPath">
+             @change="change_folder">
+            <input type="text" name="" value="" :value="imgfldr_copy">
             <label for="imgFolderCopy">
               <img src="/static/img/icons/folder.svg" alt="">
             </label>
@@ -28,8 +28,8 @@
               合成目录：
             </span>
             <input type="file" id="imgFolderComposed" webkitdirectory directory  style="display:none"
-             @change="sel_origin_folder">
-            <input type="text" name="" value="" :value="composedImgPath">
+             @change="change_folder">
+            <input type="text" name="" value="" :value="imgfldr_composed">
             <label for="imgFolderComposed">
               <img src="/static/img/icons/folder.svg" alt="">
             </label>
@@ -59,27 +59,51 @@ import { ipcRenderer } from 'electron'
       data () {
         return {
           PRINTHOST: 'http://127.0.0.1:7010',
-          originImgPath: '',
-          copyImgPath: '',
-          composedImgPath: '',
           printerLst: [],
           checkedLst: [],
           bPrinting: false
         }
       },
+      computed: {
+          imgfldr_origin: {
+              get() {
+                  return this.$store.state.ProNew.step4.imgfldr_origin
+              },
+              set(val) {
+                  console.log(val)
+                  this.set_imgfldr_path('origin', val)
+              }
+          },
+          imgfldr_copy: {
+              get() {
+                  return this.$store.state.ProNew.step4.imgfldr_copy
+              },
+              set(val) {
+                  this.set_imgfldr_path('copy', val)
+              }
+          },
+          imgfldr_composed: {
+              get() {
+                  return this.$store.state.ProNew.step4.imgfldr_composed
+              },
+              set(val) {
+                  this.set_imgfldr_path('composed', val)
+              }
+          },
+      },
       methods: {
-        sel_origin_folder () {
+        change_folder () {
           let trgtId = event.target.id
           let selPath = event.currentTarget.files[0]
           if (!selPath) {
             return
           }
           if (trgtId == 'imgFolderOrigin') {
-            this.originImgPath = selPath.path
+              this.set_imgfldr_path('origin', selPath.path)
           } else if (trgtId == 'imgFolderCopy') {
-            this.copyImgPath = selPath.path
+              this.set_imgfldr_path('copy', selPath.path)
           } else if (trgtId == 'imgFolderComposed') {
-            this.composedImgPath = selPath.path
+              this.set_imgfldr_path('composed', selPath.path)
           }
         },
         checked (index) {
@@ -104,6 +128,9 @@ import { ipcRenderer } from 'electron'
                 .catch((err) => {
                     console.error(err);
                 })
+        },
+        set_imgfldr_path(type, val) {
+            this.$store.commit('set_step4_imgfldr', {type, val})
         }
       },
       created() {

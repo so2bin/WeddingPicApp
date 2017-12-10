@@ -32,7 +32,8 @@ function createWindow () {
   Menu.setApplicationMenu(null)
 
   // self define functions
-  tools.funcs()
+  // tools.funcs()
+  tools.saveBase64()
 
   mainWindow.on('closed', () => {
     mainWindow = null

@@ -1,14 +1,30 @@
 const state = {
+  step2: {
+      val_fltr_blight: 50,
+      val_fltr_contrast: 50
+  },
   step3: {
     pro_title: '',
     pro_author: '',
     pro_phone: '',
     pro_company: '',
     pro_company_addr: ''
+  },
+  step4: {
+      imgfldr_origin: '',
+      imgfldr_copy: '',
+      imgfldr_composed: ''
   }
 }
 
 const mutations = {
+  set_step2_filter(state, {type, val}) {
+      if (type == 'blightness'){
+          state.step2.val_fltr_blight = val
+      } else if (type == 'contrast'){
+          state.step2.val_fltr_contrast = val
+      }
+  },
   set_step3_pro (state, {type, val}) {
     if (type == 'title') {
       state.step3.pro_title = val
@@ -21,15 +37,20 @@ const mutations = {
     } else if (type == 'company_addr') {
       state.step3.pro_company_addr = val
     }
+  },
+  set_step4_imgfldr (state, {type, val}) {
+      if (type == 'origin'){
+          state.step4.imgfldr_origin = val
+      } else if (type == 'copy'){
+          state.step4.imgfldr_copy = val
+      } else if (type == 'composed'){
+          state.step4.imgfldr_composed = val
+      }
   }
 }
 
 const getters = {
-  pro_title: state => state.pro_title,
-  pro_author: state => state.pro_author,
-  pro_phone: state => state.pro_phone,
-  pro_company: state => state.pro_company,
-  pro_company_addr: state => state.pro_company_addr
+
 }
 
 export default{

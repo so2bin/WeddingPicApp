@@ -42,10 +42,12 @@
           <div class="printer-list">
             <el-checkbox class="" v-for="(prntr, index) in printerLst" :key="index"
             @click.native="checked(index)" v-model="checkedLst[index]">
-              {{ prntr }}
+              {{ prntr.printerName }}
             </el-checkbox>
           </div>
-          <el-button @click.native="gotoPrint" size="mini">自动打印</el-button>
+          <div class="print-btn">
+              <el-button @click.native="gotoPrint" size="mini" :loading="bPrinting">自动打印</el-button>
+          </div>
         </div>
     </div>
 </template>
@@ -56,11 +58,13 @@ import { ipcRenderer } from 'electron'
     export default {
       data () {
         return {
+          PRINTHOST: 'http://127.0.0.1:7010',
           originImgPath: '',
           copyImgPath: '',
           composedImgPath: '',
           printerLst: [],
-          checkedLst: []
+          checkedLst: [],
+          bPrinting: false
         }
       },
       methods: {
@@ -82,39 +86,36 @@ import { ipcRenderer } from 'electron'
           this.checkedLst[index] = !this.checkedLst[index]
         },
         gotoPrint () {
-          let template = "N\nS4\nD15\nq400\nR\nB20,10,0,1,2,30,173,B,\nP0\n";
-          let printerIdx = [];
-          this.checkedLst.forEach((elem, idx) => {
-            if(elem===true){
-              printerIdx.push(idx);
-            }
-          });
-          let printerName = this.printerLst[printerIdx[0]];
-          console.log('开始打印...')
-          console.log('打印机: ', printerName)
-          console.log('打印内容: ', template)
-          printer.printDirect({
-            data:template.replace(/barcode/, "000"),
-            printer:printerName,
-            type: "RAW",
-            success:function(){
-              console.log("printed: "+barcode_text);
-            },
-            error:function(err){
-              console.error(err);
-            }
-          })
+            this.bPrinting = true
+            this.$http.get(this.PRINTHOST + '/printImg?imgUrl=' + 'C:/Users/HELIBB/Desktop/test2.jpg')
+                .then((res) => {
+                    this.bPrinting = false
+                })
+                .catch((err) => {
+                    console.error(err);
+                    this.bPrinting = false
+                })
+        },
+        getPrinterList() {
+            this.$http.get(this.PRINTHOST + '/printerLst')
+                .then((res) => {
+                    this.printerLst = res.data;
+                })
+                .catch((err) => {
+                    console.error(err);
+                })
         }
       },
       created() {
-        ipcRenderer.send('ipc-printer-list', true);
-        ipcRenderer.on('ipc-printer-list', (event, arg) => {
-          arg.forEach(elem => {
-            // body...
-            this.printerLst.push(elem);
-            this.checkedLst.push(false);
-          });
-        })
+        // ipcRenderer.send('ipc-printer-list', true);
+        // ipcRenderer.on('ipc-printer-list', (event, arg) => {
+        //   arg.forEach(elem => {
+        //     // body...
+        //     this.printerLst.push(elem);
+        //     this.checkedLst.push(false);
+        //   });
+        // })
+        this.getPrinterList()
       }
     }
 </script>
@@ -127,7 +128,7 @@ import { ipcRenderer } from 'electron'
 .step4-main-upper{
   width: 100%;
   height: 120px;
-  border: 1px solid;
+  border: 1px solid #677084;
   padding: 5px 5px;
 }
 .step4-main-upper .img-folders{
@@ -160,5 +161,22 @@ import { ipcRenderer } from 'electron'
   font-size: 20px;
   font-weight: 500;
   padding-left: 5px;
+}
+.printer-list{
+    height: 200px;
+    border: 1px solid #677084;
+}
+.printer-list .el-checkbox {
+    display: block;
+    text-align: left;
+    margin: 0px;
+    padding-top: 3px;
+    padding-left: 3px;
+}
+.print-btn {
+    padding: 20px 10px;
+}
+.print-btn .el-button{
+    float: right;
 }
 </style>

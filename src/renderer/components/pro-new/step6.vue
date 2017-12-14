@@ -10,6 +10,13 @@
                     <img :src="curShowImg" alt="">
                 </div>
             </div>
+            <div class="main-printing-list">
+                <div class="printing-list-elem"
+                :class="{printed: item.bUsed}"
+                v-for="(item, idx) in imglstCopy">
+                    {{ item.fileName }}
+                </div>
+            </div>
         </div>
         <input type="button" name="" value="下载" @click="download">
     </div>
@@ -30,8 +37,9 @@ import fx from 'glfx'
                 imglstOrigin: [],
                 imglstCopy: [],
                 imglstComposed: [],
-                imgOriginTimer: null,
+                imgProcessTimer: null,
                 PRINTHOST: 'http://127.0.0.1:7010',
+                bStopPrintint: false,
             }
         },
         computed: {
@@ -47,34 +55,45 @@ import fx from 'glfx'
         },
         methods: {
             creOriginImgsTimer() {
-                if(!this.imgOriginTimer){
-                    if(this.imgfldrOrigin){
-                        fs.stat(this.imgfldrOrigin, (err, stats) => {
-                            if(err){
-                                console.error(err);
-                                return;
-                            }
-                            if(stats.isDirectory()){
-                                this.imgOriginTimer = window.setInterval(this.getOriginImgsList, 5000);
-                                // 立刻执行一次
-                                this.getOriginImgsList();
-                                console.log('timer created!')
-                            }
-                        })
-                    }else{
-
+                if(!this.imgProcessTimer){
+                    if(this.imgfldrOrigin || this.imgfldrCopy){
+                        this.imgProcessTimer = window.setInterval(this.getImgsLists, 5000);
+                        // 立刻执行一次
+                        this.getImgsLists();
+                        console.log('timer created!')
                     }
                 }
             },
-            // 获取原始图片列表
-            getOriginImgsList() {
-                fs.readdir(this.imgfldrOrigin, (err, files) => {
-                    let imglst = [];
-                    files.forEach((file) => {
-                        imglst.push(path.join(this.imgfldrOrigin, file));
-                    })
-                    this.imglstOrigin = imglst;
-                })
+            getImgsInFolder(folder, target){
+                if(folder){
+                    let stat = fs.statSync(folder);
+                    if(stat && stat.isDirectory()){
+                        fs.readdir(folder, (err, files) => {
+                            let imglst = [];
+                            files.forEach((file) => {
+                                let fpath = path.join(folder, file)
+                                let obj = fs.statSync(fpath)
+                                if(obj && obj.isFile()){
+                                    imglst.push({
+                                        'fullPath': fpath,
+                                        'bUsed': false,
+                                        'fileName': file
+                                    });
+                                }
+                            })
+                            if(target == 'origin'){
+                                this.imglstOrigin = imglst;
+                            }else if (target == 'copy') {
+                                this.imglstCopy = imglst
+                            }
+                        })
+                    }
+                }
+            },
+            // 获取图片列表: 原始图片（待处理），处理后图片（待打印）
+            getImgsLists() {
+                this.getImgsInFolder(this.imgfldrOrigin, 'origin');
+                this.getImgsInFolder(this.imgfldrCopy, 'copy');
             },
             // 美化照片
             beautyPicturs() {
@@ -93,22 +112,41 @@ import fx from 'glfx'
                         let filepath = path.join(_this.imgfldrCopy, imgName);
                         ipcRenderer.send('ipc-savebase64', {data:base64Str, filepath});
                         ipcRenderer.on('ipc-savebase64', (event, arg)=>{
-                            if(arg.status === 0){
-                                _this.$http.get(_this.PRINTHOST + '/printImg?imgUrl=' + arg.filepath)
-                                    .then((res) => {
-                                        console.log('打印成功');
-                                    })
-                                    .catch((err) => {
-                                        console.error(err);
-                                    })
-                            }
+                            // if(arg.status === 0){
+                            //     _this.$http.get(_this.PRINTHOST + '/printImg?imgUrl=' + arg.filepath)
+                            //         .then((res) => {
+                            //             console.log('打印成功');
+                            //         })
+                            //         .catch((err) => {
+                            //             console.error(err);
+                            //         })
+                            // }
                         })
                     }
                 });
             },
             download() {
-                console.log('test dowlonad')
-                this.beautyPicturs()
+                // console.log('test dowlonad')
+                // this.beautyPicturs()
+                this.$http.post(this.PRINTHOST+'/enhanceImg', {
+                    "originAddr":"D:\\Node\\Imgs\\origin\\2012级2班.jpg",
+                    "targetAddr":"D:\\Node\\Imgs\\copy",
+                    "brightness":0.5,
+                    "contrast":10,
+                    "saveStartNo":"0000"
+                })
+                .then((res)=>{
+                    console.log(res)
+                })
+                .catch((err)=>{
+                    console.error(err);
+                })
+            }
+        },
+        // 开始打印，逐条处理
+        begainPrinting() {
+            if(this.imglstOrigin.length > 0){
+                console.log('begin printing');
             }
         },
         beforeRouteEnter (to, from, next) {
@@ -117,8 +155,8 @@ import fx from 'glfx'
             })
         },
         beforeRouteLeave (to, from, next) {
-            window.clearInterval(this.imgOriginTimer);
-            this.imgOriginTimer = null
+            window.clearInterval(this.imgProcessTimer);
+            this.imgProcessTimer = null
             next();
             console.log('time cleared!')
         },
@@ -130,12 +168,40 @@ import fx from 'glfx'
     padding: 10px 0px;
     height: 430px;
 }
-.main-before-process-list{
-    width: 70%;
+.step6-main {
+    width: 100%;
     height: 400px;
+    display: inline-block;
+}
+.main-before-process-list{
+    width: 60%;
+    height: 100%;
     border: 1px solid #677084;
     padding: 5px 5px;
     overflow-y: scroll;
+    float: left;
+}
+.main-printing-list{
+    margin-left: 3px;
+    width: 20%;
+    height: 100%;
+    border: 1px solid #677084;
+    float: left;
+}
+.printing-list-elem{
+    padding-left: 1px;
+    padding-right: 1px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+.printing-list-elem:hover{
+    cursor: pointer;
+}
+.unprinted{
+    background-color: #a9bce6;
+}
+.printed{
+    background-color: rgba(3, 197, 25, 0.63);
 }
 .befor-process-img-small{
 

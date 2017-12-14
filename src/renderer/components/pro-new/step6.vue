@@ -34,12 +34,13 @@ import fx from 'glfx'
                 imgfldrOrigin: this.$store.state.ProNew.step4.imgfldr_origin,
                 imgfldrCopy: this.$store.state.ProNew.step4.imgfldr_copy,
                 imgfldrComposed: this.$store.state.ProNew.step4.imgfldr_composed,
-                imglstOrigin: [],
+                imglstOrigin: [],  // time orderd queue, FIFO
                 imglstCopy: [],
                 imglstComposed: [],
                 imgProcessTimer: null,
                 PRINTHOST: 'http://127.0.0.1:7010',
-                bStopPrintint: false,
+                bStopWork: false,
+                curBtyImgNo: '0000',  // 起始图片编号
             }
         },
         computed: {
@@ -126,28 +127,53 @@ import fx from 'glfx'
                 });
             },
             download() {
-                // console.log('test dowlonad')
-                // this.beautyPicturs()
-                this.$http.post(this.PRINTHOST+'/enhanceImg', {
-                    "originAddr":"D:\\Node\\Imgs\\origin\\2012级2班.jpg",
-                    "targetAddr":"D:\\Node\\Imgs\\copy",
-                    "brightness":0.5,
-                    "contrast":10,
-                    "saveStartNo":"0000"
-                })
-                .then((res)=>{
-                    console.log(res)
-                })
-                .catch((err)=>{
-                    console.error(err);
-                })
-            }
-        },
-        // 开始打印，逐条处理
-        begainPrinting() {
-            if(this.imglstOrigin.length > 0){
-                console.log('begin printing');
-            }
+                this.continueBeautyImgs()
+            },
+            // 处理一张照片，从队列中找出第一张，FIFO
+            beautyImgOnce(){
+                if(this.imglstOrigin.length > 0){
+                    let curBtyImg = this.imglstOrigin[0];
+                    if(curBtyImg){
+                        return this.$http.post(this.PRINTHOST+'/enhanceImg', {
+                            "originAddr": curBtyImg.fullPath,
+                            "targetAddr": this.imgfldrCopy,
+                            "brightness":0.5,
+                            "contrast":10,
+                            "saveStartNo":this.curBtyImgNo
+                        })
+                        // .then((res)=>{
+                        //     if(res.status == 0){
+                        //         this.imglstOrigin.shift();
+                        //         return true;
+                        //     }
+                        // })
+                    }
+                }
+                return false;
+            },
+            // 连续处理照片，直到被通知暂停
+            continueBeautyImgs: async function(){
+                while(this.imglstOrigin.length > 0){
+                    try{
+                        let res = await this.beautyImgOnce();
+                        if(res.status !== 200 || res.data.status != 0){
+                            throw new Error(res.data.msg)
+                        }else{
+                            this.imglstOrigin.shift();
+                            this.curBtyImgNo = res.data.imgNo[res.data.imgNo.length-1]
+                        }
+                    }catch(err){
+                        console.error(err)
+                        break;
+                    }
+                }
+            },
+            // 开始打印，逐条处理，每次只取队列第一条数据， FIFO
+            begainPrinting() {
+                if(this.imglstOrigin.length > 0){
+                    console.log('begin printing');
+                }
+            },
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {

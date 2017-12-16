@@ -1,9 +1,10 @@
 <template lang="">
 <div class="step1">
     <el-container class="step1-container">
-        <el-main class="step1-main">
-
-        </el-main>
+        <div id="step1-main" class="step1-main" v-on:mousedown="cmosDown" v-on:mousemove="cmosMove" v-on:mouseup="cmosUp">
+            <canvas id="canvas" :width="tmpW" :height="tmpH">
+            </canvas>
+        </div>
         <el-aside class="step1-aside" width="37%">
             <div class="step1-row">
                 <span class="aside-tips">项目名称：</span>
@@ -28,22 +29,113 @@
 
 <script lang="">
 export default {
-  data () {
-    return {
-      sel_val: null,
-      pro_name: '',
-      options: [{
-        label: '规格一',
-        value: 1
-      },
-      {
-        label: '规格二',
-        value: 2
-      }
-      ],
-      bInsertQRCode: '1'
-    }
-  }
+    data () {
+        return {
+            sel_val: null,
+            pro_name: '',
+            options: [
+                {
+                    label: '规格一',
+                    value: 1
+                },
+                {
+                    label: '规格二',
+                    value: 2
+                }
+            ],
+            bInsertQRCode: '1',
+            tmpW: 400,
+            tmpH: 300,
+            bMosDown: false,
+            sx: 0,
+            sy: 0,
+            ex: 0,
+            ey: 0,
+            canvas: null,
+            ctx: null,
+            mainObj: null,
+            cnvSX: 0,
+            cnvSY: 0,
+            cnvEX: 0,
+            cnvEY: 0
+        }
+    },
+    methods: {
+        clearCanvas(){
+            if(this.ctx){
+                this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+            }
+        },
+        getCX(e){
+            if(e.target.id == 'canvas'){
+                return e.offsetX;
+            }else{
+                if(e.offsetX < this.cnvSX){
+                    return 0;
+                }else if (e.offsetX > this.cnvEX) {
+                    return this.canvas.width;
+                }else{
+                    return e.offsetX - this.cnvSX;
+                };
+            }
+        },
+        getCY(e){
+            if(e.target.id == 'canvas'){
+                return e.offsetY;
+            }else{
+                if(e.offsetY < this.cnvSY){
+                    return 0;
+                }else if (e.offsetY > this.cnvEY) {
+                    return this.canvas.height;
+                }else{
+                    return e.offsetY - this.cnvSY;
+                };
+            }
+        },
+        cmosDown(e){
+            this.bMosDown = true;
+            if(!this.mainObj){
+                this.mainObj = document.getElementById('step1-main');
+            }
+            if(!this.canvas){
+                this.canvas = document.getElementById('canvas');
+                this.cnvSX = this.canvas.offsetLeft - this.mainObj.offsetLeft;
+                this.cnvSY = this.canvas.offsetTop - this.mainObj.offsetTop;
+                this.cnvEX = this.canvas.width + this.cnvSX;
+                this.cnvEY = this.canvas.height + this.cnvSY;
+            }
+            if(!this.ctx){
+                this.ctx = this.canvas.getContext('2d');
+                this.ctx.fillStyle = '#ff0000';
+                this.ctx.strokeStyle = '#f30101'
+            }
+            this.ex = this.sx = this.getCX(e);
+            this.ey = this.sy = this.getCY(e);
+            this.clearCanvas();
+        },
+        cmosMove(e){
+            if(this.bMosDown){
+                this.ex = this.getCX(e);
+                this.ey = this.getCY(e);
+                this.clearCanvas();
+                this.ctx.setLineDash([6]);
+                this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy)
+            }
+        },
+        cmosUp(e){
+            this.bMosDown = false;
+            this.ex = this.getCX(e);
+            this.ey = this.getCY(e);
+            this.clearCanvas();
+            this.ctx.setLineDash([6]);
+            this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy)
+        },
+    },
+    beforeRouteEnter (to, from, next) {
+        next(vm => {
+
+        })
+    },
 }
 </script>
 
@@ -62,6 +154,16 @@ export default {
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     padding: 10px;
+    text-align: center;
+}
+#canvas {
+    background: #d3dce6;
+    border: 1px solid;
+    margin: 0 auto;
+    position: relative;
+    top: 50%;
+    margin-top: -150px;
+    cursor: crosshair;
 }
 
 .step1-aside {
@@ -85,4 +187,5 @@ export default {
     line-height: 40px;
     height: 40px;
 }
+
 </style>

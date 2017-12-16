@@ -11,9 +11,9 @@ const state = {
     pro_company_addr: ''
   },
   step4: {
-      imgfldr_origin: '',
-      imgfldr_copy: '',
-      imgfldr_composed: ''
+      imgfldr_origin: 'D:\\Node\\Imgs\\origin',
+      imgfldr_copy: 'D:\\Node\\Imgs\\copy',
+      imgfldr_composed: 'D:\\Node\\Imgs\\composed'
   }
 }
 

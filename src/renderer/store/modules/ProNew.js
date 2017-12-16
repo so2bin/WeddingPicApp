@@ -1,4 +1,17 @@
 const state = {
+  step1: {
+      // 模板相关固有属性
+      tmpUrl: "",
+      tmpW: 400,
+      tmpH: 300,
+      rw: 3,
+      rh: 2,
+      // 用户选择展示区域
+      sx: 0,
+      sy: 0,
+      selW: 0,
+      selH: 0
+  },
   step2: {
       val_fltr_blight: 50,
       val_fltr_contrast: 50
@@ -18,6 +31,27 @@ const state = {
 }
 
 const mutations = {
+  set_step1(state, {type, val}){
+      if(type == 'tmpUrl'){
+          state.step1.tmpUrl = val
+      }else if (type == 'tmpW') {
+          state.step1.tmpW = val
+      }else if (type == 'tmpH') {
+          state.step1.tmpH = val
+      }else if (type == 'rw') {
+          state.step1.rw = val
+      }else if (type == 'rh') {
+          state.step1.rh = val
+      }else if (type == 'sx') {
+          state.step1.sx = val
+      }else if (type == 'sy') {
+          state.step1.sy = val
+      }else if (type == 'selW') {
+          state.step1.selW = val
+      }else if (type == 'selH') {
+          state.step1.selH = val
+      }
+  },
   set_step2_filter(state, {type, val}) {
       if (type == 'blightness'){
           state.step2.val_fltr_blight = val

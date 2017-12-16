@@ -1,9 +1,16 @@
 <template lang="">
 <div class="step1">
     <el-container class="step1-container">
-        <div id="step1-main" class="step1-main" v-on:mousedown="cmosDown" v-on:mousemove="cmosMove" v-on:mouseup="cmosUp">
-            <canvas id="canvas" :width="tmpW" :height="tmpH">
-            </canvas>
+        <div class="">
+            <div id="step1-main" class="step1-main" v-on:mousedown="cmosDown" v-on:mousemove="cmosMove" v-on:mouseup="cmosUp">
+                <canvas id="canvas" :width="tmpW" :height="tmpH">
+                </canvas>
+            </div>
+            <div class="data-tips">
+                <span class="tips-item">起点：({{ sx }}, {{ sy }})</span>
+                <span class="tips-item">宽：{{ selW }}</span>
+                <span class="tips-item">高：{{ selH }}</span>
+            </div>
         </div>
         <el-aside class="step1-aside" width="37%">
             <div class="step1-row">
@@ -44,11 +51,11 @@ export default {
                 }
             ],
             bInsertQRCode: '1',
-            tmpW: 400,
-            tmpH: 300,
             bMosDown: false,
-            sx: 0,
-            sy: 0,
+            // tmpW: this.model.tmpW,
+            // tmpH: this.model.tmpH,
+            // sx: this.model.sx,
+            // sy: this.mode.sy,
             ex: 0,
             ey: 0,
             canvas: null,
@@ -59,6 +66,72 @@ export default {
             cnvEX: 0,
             cnvEY: 0
         }
+    },
+    computed: {
+        tmpW:{
+            get() {
+                return this.$store.state.ProNew.step1.tmpW
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'tmpW', val})
+            }
+        },
+        tmpH:{
+            get() {
+                return this.$store.state.ProNew.step1.tmpH
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'tmpW', tmpH})
+            }
+        },
+        rw:{
+            get() {
+                return this.$store.state.ProNew.step1.rw
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'rw', val})
+            }
+        },
+        rh:{
+            get() {
+                return this.$store.state.ProNew.step1.rh
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'rh', val})
+            }
+        },
+        sx:{
+            get() {
+                return this.$store.state.ProNew.step1.sx
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'sx', val})
+            }
+        },
+        sy:{
+            get() {
+                return this.$store.state.ProNew.step1.sy
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'sy', val})
+            }
+        },
+        selW:{
+            get() {
+                return Math.abs(this.sx - this.ex);
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'selW', val})
+            }
+        },
+        selH:{
+            get() {
+                return Math.abs(this.sy - this.ey)
+            },
+            set(val) {
+                this.$store.commit('set_step1', {type: 'selH', val})
+            }
+        },
     },
     methods: {
         clearCanvas(){
@@ -92,6 +165,15 @@ export default {
                 };
             }
         },
+        getScaleCYWithCX(e){
+            let sclH = Math.round(this.rh * this.selW / this.rw);
+            let ry = this.getCY(e);  // 当前真实的y
+            if(ry > this.sy){
+                return sclH + this.sy;
+            }else{
+                return this.sy - sclH;
+            }
+        },
         cmosDown(e){
             this.bMosDown = true;
             if(!this.mainObj){
@@ -116,19 +198,23 @@ export default {
         cmosMove(e){
             if(this.bMosDown){
                 this.ex = this.getCX(e);
-                this.ey = this.getCY(e);
+                this.ey = this.getScaleCYWithCX(e);
                 this.clearCanvas();
                 this.ctx.setLineDash([6]);
-                this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy)
+                this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
+                this.ctx.fillStyle="rgba(220,158,20,0.81)";
+                this.ctx.fillRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
             }
         },
         cmosUp(e){
             this.bMosDown = false;
             this.ex = this.getCX(e);
-            this.ey = this.getCY(e);
+            this.ey = this.getScaleCYWithCX(e);
             this.clearCanvas();
             this.ctx.setLineDash([6]);
-            this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy)
+            this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
+            this.ctx.fillStyle="rgba(220,158,20,0.81)";
+            this.ctx.fillRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
         },
     },
     beforeRouteEnter (to, from, next) {
@@ -153,8 +239,12 @@ export default {
     border: 1px solid #A5A060;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
     padding: 10px;
     text-align: center;
+    height: 380px;
+    cursor: crosshair;
 }
 #canvas {
     background: #d3dce6;
@@ -163,9 +253,19 @@ export default {
     position: relative;
     top: 50%;
     margin-top: -150px;
-    cursor: crosshair;
 }
-
+.data-tips{
+    margin-right: 3px;
+    height: 50px;
+    border: 1px solid #A5A060;
+    border-top: 0px;
+    text-align: left;
+    padding-left: 5px;
+}
+.tips-item{
+    padding-left: 8px;
+    line-height: 50px;
+}
 .step1-aside {
     padding: 10px 0px;
     border: 1px solid #A5A060;

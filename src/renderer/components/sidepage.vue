@@ -2,7 +2,7 @@
     <div class="nav">
         <el-col :span="24">
             <div class="nav-tip">
-                <p>功能导航栏</p>
+                <p>导航栏</p>
             </div>
           <el-menu
             default-active="2"
@@ -13,15 +13,15 @@
             text-color="#455667"
             active-text-color="#f94239"
             router>
-            <el-menu-item index="/bodypage" style="padding-left:0px;">
+            <el-menu-item index="/bodypage" style="padding-left:10px;">
               <i class="el-icon-star-on"></i>
               <span slot="title" class="router-nav">首页</span>
             </el-menu-item>
-            <el-menu-item index="/pronew" style="padding-left:0px;" >
+            <el-menu-item index="/pronew" style="padding-left:10px;" >
               <i class="el-icon-circle-plus-outline"></i>
               <span slot="title" class="router-nav">新建</span>
             </el-menu-item>
-            <el-menu-item index="/help" style="padding-left:0px;">
+            <el-menu-item index="/help" style="padding-left:10px;">
               <i class="el-icon-question"></i>
               <span slot="title" class="router-nav">关于</span>
             </el-menu-item>
@@ -46,7 +46,7 @@
 
 <style lang="" scoped>
     .el-menu-item {
-        width: 100%;
+        width: 100px;
         min-width: 100px;
     }
     .el-submenu__title {

@@ -2,11 +2,11 @@
 <div class="pro-new">
     <!-- 步骤组件 -->
     <el-steps :space="100" :active="step" :align-center="true" class="step">
-        <el-step title="步骤一" description="基础设置"></el-step>
-        <el-step title="步骤二" description="图片设置"></el-step>
-        <el-step title="步骤三" description="微信设置"></el-step>
-        <el-step title="步骤四" description="打印设置"></el-step>
-        <el-step title="步骤五" description="容量选择"></el-step>
+        <el-step title="基础设置" description=""></el-step>
+        <el-step title="图片设置" description=""></el-step>
+        <el-step title="微信设置" description=""></el-step>
+        <el-step title="打印设置" description=""></el-step>
+        <el-step title="容量选择" description=""></el-step>
         <el-step title="完成" description=""></el-step>
     </el-steps>
 
@@ -121,6 +121,9 @@ export default {
 }
 
 .pro-new .but-group .el-button {
-    margin-right: 20px;
+    margin-right: 15px;
+}
+.el-step__title{
+    font-size: 10px !important;
 }
 </style>

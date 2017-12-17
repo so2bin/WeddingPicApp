@@ -1,16 +1,37 @@
+let tmplst = require('./Tmplst.js')
+let dftTmp = tmplst.default.state.tmpLst[0];
+let dftImgRate = tmplst.default.state.imgRate[0];
+
 const state = {
   step1: {
-      // 模板相关固有属性
-      tmpUrl: "",
-      tmpW: 400,
-      tmpH: 300,
-      rw: 3,
-      rh: 2,
-      // 用户选择展示区域
-      sx: 0,
-      sy: 0,
-      selW: 0,
-      selH: 0
+      /********  横向模板 ***********/
+      lng: {
+          // 横向模板相关固有属性
+          tmpUrl: "",
+          tmpW: dftTmp.showW,
+          tmpH: dftTmp.showH,
+          rw: dftImgRate.rw,
+          rh: dftImgRate.rh,
+          // 用户选择展示区域
+          sx: 0,
+          sy: 0,
+          selW: 0,
+          selH: 0
+      },
+      /*******  纵向模板 ******/
+      hr: {
+          // 横向模板相关固有属性
+          tmpUrl: "",
+          tmpW: dftTmp.showW,
+          tmpH: dftTmp.showH,
+          rw: dftImgRate.rw,
+          rh: dftImgRate.rh,
+          // 用户选择展示区域
+          sx: 0,
+          sy: 0,
+          selW: 0,
+          selH: 0
+      }
   },
   step2: {
       val_fltr_blight: 50,
@@ -31,25 +52,46 @@ const state = {
 }
 
 const mutations = {
-  set_step1(state, {type, val}){
+  set_step1_lng(state, {type, val}){
       if(type == 'tmpUrl'){
-          state.step1.tmpUrl = val
+          state.step1.lng.tmpUrl = val
       }else if (type == 'tmpW') {
-          state.step1.tmpW = val
+          state.step1.lng.tmpW = val
       }else if (type == 'tmpH') {
-          state.step1.tmpH = val
+          state.step1.lng.tmpH = val
       }else if (type == 'rw') {
-          state.step1.rw = val
+          state.step1.lng.rw = val
       }else if (type == 'rh') {
-          state.step1.rh = val
+          state.step1.lng.rh = val
       }else if (type == 'sx') {
-          state.step1.sx = val
+          state.step1.lng.sx = val
       }else if (type == 'sy') {
-          state.step1.sy = val
+          state.step1.lng.sy = val
       }else if (type == 'selW') {
-          state.step1.selW = val
+          state.step1.lng.selW = val
       }else if (type == 'selH') {
-          state.step1.selH = val
+          state.step1.lng.selH = val
+      }
+  },
+  set_step1_hr(state, {type, val}){
+      if(type == 'tmpUrl'){
+          state.step1.hr.tmpUrl = val
+      }else if (type == 'tmpW') {
+          state.step1.hr.tmpW = val
+      }else if (type == 'tmpH') {
+          state.step1.hr.tmpH = val
+      }else if (type == 'rw') {
+          state.step1.hr.rw = val
+      }else if (type == 'rh') {
+          state.step1.hr.rh = val
+      }else if (type == 'sx') {
+          state.step1.hr.sx = val
+      }else if (type == 'sy') {
+          state.step1.hr.sy = val
+      }else if (type == 'selW') {
+          state.step1.hr.selW = val
+      }else if (type == 'selH') {
+          state.step1.hr.selH = val
       }
   },
   set_step2_filter(state, {type, val}) {

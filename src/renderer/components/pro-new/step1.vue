@@ -1,15 +1,26 @@
 <template lang="">
 <div class="step1">
     <el-container class="step1-container">
-        <div class="">
-            <div id="step1-main" class="step1-main" v-on:mousedown="cmosDown" v-on:mousemove="cmosMove" v-on:mouseup="cmosUp">
-                <canvas id="canvas" :width="tmpW" :height="tmpH">
-                </canvas>
+        <div class="step1-main-show" v-show="tabActive('long')">
+            <div id="step1-main-lng" class="step1-main" v-on:mousedown="cmosDownL" v-on:mousemove="cmosMoveL" v-on:mouseup="cmosUpL">
+                <canvas id="canvas-lng" class="canvas" :width="tmpLW" :height="tmpLH"
+                    :style="styleCanvasSizeL" ></canvas>
             </div>
             <div class="data-tips">
-                <span class="tips-item">起点：({{ sx }}, {{ sy }})</span>
-                <span class="tips-item">宽：{{ selW }}</span>
-                <span class="tips-item">高：{{ selH }}</span>
+                <span class="tips-item">起点：({{ slx }}, {{ sly }})</span>
+                <span class="tips-item">宽：{{ selLW }}</span>
+                <span class="tips-item">高：{{ selLH }}</span>
+            </div>
+        </div>
+        <div class="step1-main-show" v-show="tabActive('horizon')">
+            <div id="step1-main-hr" class="step1-main" v-on:mousedown="cmosDownH" v-on:mousemove="cmosMoveH" v-on:mouseup="cmosUpH">
+                <canvas id="canvas-hr" class="canvas" :width="tmpHW" :height="tmpHH"
+                    :style="styleCanvasSizeH" v-show="tabActive('horizon')"></canvas>
+            </div>
+            <div class="data-tips">
+                <span class="tips-item">起点：({{ shx }}, {{ shy }})</span>
+                <span class="tips-item">宽：{{ selHW }}</span>
+                <span class="tips-item">高：{{ selHH }}</span>
             </div>
         </div>
         <el-aside class="step1-aside" width="37%">
@@ -19,9 +30,59 @@
             </div>
             <div class="step1-row">
                 <span class="aside-tips">项目尺寸：</span>
-                <el-select v-model="sel_val" placeholder="请选择" size="small" style="width:120px; height:40px; line-height:40px;">
-                    <el-option v-for="item in options" :label="item.label" :value="item.value"></el-option>
+                <el-select v-model="selTmp" placeholder="请选择" size="small" @change="tmpChanged"
+                    style="width:120px; height:40px; line-height:40px;">
+                    <el-option v-for="(tmp, index) in tmpLst" :label="tmp.name" :value="index"></el-option>
                 </el-select>
+            </div>
+            <div class="step1-row">
+                <span class="aside-tips">照片比例：</span>
+                <el-select v-model="selImgRate" placeholder="请选择" size="small" @change="imgRateChanged"
+                    style="width:120px; height:40px; line-height:40px;">
+                    <el-option v-for="(tmp, index) in imgRateLst" :label="tmp.name" :value="index"></el-option>
+                </el-select>
+            </div>
+            <div class="tmp-hv">
+                <div class="tmp-tab">
+                    <div class="tab-head" @click="selectTab">
+                        <span id="tab-head-itm-long" class="tab-head-itm" :class="{'tab-active': bShowLong}">纵向</span>
+                        <span id="tab-head-itm-horizon"  class="tab-head-itm" :class="{'tab-active': !bShowLong}">横向</span>
+                    </div>
+                    <div class="tab-show" v-show="tabActive('long')">
+                        <div class="">
+                            <span>选择模板：</span>
+                            <el-select v-model="selHrTmpIdx" placeholder="请选择" size="small" @change="imgRateChanged"
+                                style="width:120px; height:40px; line-height:40px;">
+                                <el-option v-for="(tmp, index) in defTmps.horiz" :label="tmp.name" :value="index"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="tmp-selector" v-show="selHrTmpIdx==2">
+                            <input type="file" id="selfLngTmp" style="display:none"
+                             @change="selectSelfTmp">
+                            <input type="text" name=""  :value="confTmpLngUrl">
+                            <label for="selfLngTmp">
+                              <img src="/static/img/icons/folder.svg" alt="">
+                            </label>
+                        </div>
+                    </div>
+                    <div class="tab-show" v-show="tabActive('horizon')">
+                        <div class="">
+                            <span>选择模板：</span>
+                            <el-select v-model="selLngTmpIdx" placeholder="请选择" size="small" @change="imgRateChanged"
+                                style="width:120px; height:40px; line-height:40px;">
+                                <el-option v-for="(tmp, index) in defTmps.long" :label="tmp.name" :value="index"></el-option>
+                            </el-select>
+                        </div>
+                        <div class="tmp-selector" v-show="selLngTmpIdx==2">
+                            <input type="file" id="selfHrTmp"  style="display:none"
+                             @change="selectSelfTmp">
+                            <input type="text" name="" :value="confTmpHrUrl">
+                            <label for="selfHzTmp">
+                              <img src="/static/img/icons/folder.svg" alt="">
+                            </label>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="step1-row">
                 <template>
@@ -38,184 +99,425 @@
 export default {
     data () {
         return {
-            sel_val: null,
+            selTmp: 0,
+            selImgRate: 0,
             pro_name: '',
-            options: [
-                {
-                    label: '规格一',
-                    value: 1
-                },
-                {
-                    label: '规格二',
-                    value: 2
-                }
-            ],
             bInsertQRCode: '1',
             bMosDown: false,
-            // tmpW: this.model.tmpW,
-            // tmpH: this.model.tmpH,
-            // sx: this.model.sx,
-            // sy: this.mode.sy,
-            ex: 0,
-            ey: 0,
-            canvas: null,
-            ctx: null,
-            mainObj: null,
-            cnvSX: 0,
-            cnvSY: 0,
-            cnvEX: 0,
-            cnvEY: 0
+            elx: 0,
+            ely: 0,
+            ehx: 0,
+            ehy: 0,
+            canvasL: null,
+            ctxL: null,
+            canvasH: null,
+            ctxH: null,
+            mainObjL: null,
+            mainObjH: null,
+            cnvSLX: 0,
+            cnvSLY: 0,
+            cnvELX: 0,
+            cnvELY: 0,
+            cnvSHX: 0,
+            cnvSHY: 0,
+            cnvEHX: 0,
+            cnvEHY: 0,
+            bShowLong: true,
+            selHrTmpIdx: 0,
+            selLngTmpIdx: 0
         }
     },
     computed: {
-        tmpW:{
+        /***** 横向模板  ****/
+        tmpLW:{
             get() {
-                return this.$store.state.ProNew.step1.tmpW
+                return this.$store.state.ProNew.step1.lng.tmpW
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'tmpW', val})
+                this.$store.commit('set_step1_lng', {type: 'tmpW', val})
             }
         },
-        tmpH:{
+        tmpLH:{
             get() {
-                return this.$store.state.ProNew.step1.tmpH
+                return this.$store.state.ProNew.step1.lng.tmpH
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'tmpW', tmpH})
+                this.$store.commit('set_step1_lng', {type: 'tmpH', val})
             }
         },
-        rw:{
+        // 左模板照片
+        rlw:{
             get() {
-                return this.$store.state.ProNew.step1.rw
+                return this.$store.state.ProNew.step1.lng.rw
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'rw', val})
+                this.$store.commit('set_step1_lng', {type: 'rw', val})
             }
         },
-        rh:{
+        rlh:{
             get() {
-                return this.$store.state.ProNew.step1.rh
+                return this.$store.state.ProNew.step1.lng.rh
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'rh', val})
+                this.$store.commit('set_step1_lng', {type: 'rh', val})
             }
         },
-        sx:{
+        // 用户选择区域起点
+        slx:{
             get() {
-                return this.$store.state.ProNew.step1.sx
+                return this.$store.state.ProNew.step1.lng.sx
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'sx', val})
+                this.$store.commit('set_step1_lng', {type: 'sx', val})
             }
         },
-        sy:{
+        sly:{
             get() {
-                return this.$store.state.ProNew.step1.sy
+                return this.$store.state.ProNew.step1.lng.sy
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'sy', val})
+                this.$store.commit('set_step1_lng', {type: 'sy', val})
             }
         },
-        selW:{
+        //  用户选择区域 W H
+        selLW:{
             get() {
-                return Math.abs(this.sx - this.ex);
+                return Math.abs(this.slx - this.elx);
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'selW', val})
+                this.$store.commit('set_step1_lng', {type: 'selW', val})
             }
         },
-        selH:{
+        selLH:{
             get() {
-                return Math.abs(this.sy - this.ey)
+                return Math.abs(this.sly - this.ely)
             },
             set(val) {
-                this.$store.commit('set_step1', {type: 'selH', val})
+                this.$store.commit('set_step1_lng', {type: 'selH', val})
+            }
+        },
+        /***** 纵向模板  ******/
+        tmpHW:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.tmpW
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'tmpW', val})
+            }
+        },
+        tmpHH:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.tmpH
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'tmpH', val})
+            }
+        },
+        rhw:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.rw
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'rw', val})
+            }
+        },
+        rhh:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.rh
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'rh', val})
+            }
+        },
+        shx:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.sx
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'sx', val})
+            }
+        },
+        shy:{
+            get() {
+                return this.$store.state.ProNew.step1.hr.sy
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'sy', val})
+            }
+        },
+        selHW:{
+            get() {
+                return Math.abs(this.shx - this.ehx);
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'selW', val})
+            }
+        },
+        selHH:{
+            get() {
+                return Math.abs(this.shy - this.ehy)
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'selH', val})
+            }
+        },
+
+        tmpLst(){
+            return this.$store.state.Tmplst.tmpLst;
+        },
+        imgRateLst(){
+            return this.$store.state.Tmplst.imgRate;
+        },
+        styleCanvasSizeL(){
+            return {
+                "margin-top": -Math.round(this.tmpLH/2)+"px",
+                "margin-left": -Math.round(this.tmpLW/2)+"px",
+            }
+        },
+        styleCanvasSizeH(){
+            return {
+                "margin-top": -Math.round(this.tmpHH/2)+"px",
+                "margin-left": -Math.round(this.tmpHW/2)+"px",
+            }
+        },
+        defTmps(){
+            return this.$store.state.Tmplst.defTmps;
+        },
+        confTmpLngUrl: {
+            get() {
+                return this.$store.state.ProCnf.tmp.lng.url;
+            },
+            set(val) {
+                this.$store.commit('set_cnf_tmp_url', {type: 'lng', val})
+            }
+        },
+        confTmpHrUrl: {
+            get() {
+                return this.$store.state.ProCnf.tmp.hr.url;
+            },
+            set(val) {
+                this.$store.commit('set_cnf_tmp_url', {type: 'hr', val})
             }
         },
     },
     methods: {
-        clearCanvas(){
-            if(this.ctx){
-                this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+        clearCanvas(type){
+            if(type == 'lng'){
+                if(this.ctxL){
+                    this.ctxL.clearRect(0, 0, this.ctxL.canvas.width, this.ctxL.canvas.height);
+                }
+            }else if(type == 'hr'){
+                if(this.ctxH){
+                    this.ctxH.clearRect(0, 0, this.ctxH.canvas.width, this.ctxH.canvas.height);
+                }
             }
         },
         getCX(e){
-            if(e.target.id == 'canvas'){
+            if(e.target.id == 'canvas-lng' || e.target.id == 'canvas-hr'){
                 return e.offsetX;
-            }else{
-                if(e.offsetX < this.cnvSX){
+            }else if(e.target.id == 'step1-main-lng'){
+                if(e.offsetX < this.cnvSLX){
                     return 0;
-                }else if (e.offsetX > this.cnvEX) {
-                    return this.canvas.width;
+                }else if (e.offsetX > this.cnvELX) {
+                    return this.canvasL.width;
                 }else{
-                    return e.offsetX - this.cnvSX;
+                    return e.offsetX - this.cnvSLX;
+                };
+            }else if(e.target.id == 'step1-main-hr'){
+                if(e.offsetX < this.cnvSHX){
+                    return 0;
+                }else if (e.offsetX > this.cnvEHX) {
+                    return this.canvasH.width;
+                }else{
+                    return e.offsetX - this.cnvSHX;
                 };
             }
         },
         getCY(e){
-            if(e.target.id == 'canvas'){
+            if(e.target.id == 'canvas-lng' || e.target.id == 'canvas-hr'){
                 return e.offsetY;
-            }else{
-                if(e.offsetY < this.cnvSY){
+            }else if(e.target.id == 'step1-main-lng'){
+                if(e.offsetY < this.cnvSLY){
                     return 0;
-                }else if (e.offsetY > this.cnvEY) {
-                    return this.canvas.height;
+                }else if (e.offsetY > this.cnvELY) {
+                    return this.canvasL.height;
                 }else{
-                    return e.offsetY - this.cnvSY;
+                    return e.offsetY - this.cnvSLY;
+                };
+            }else if(e.target.id == 'step1-main-hr'){
+                if(e.offsetY < this.cnvSHY){
+                    return 0;
+                }else if (e.offsetY > this.cnvEHY) {
+                    return this.canvasH.height;
+                }else{
+                    return e.offsetY - this.cnvSHY;
                 };
             }
         },
-        getScaleCYWithCX(e){
-            let sclH = Math.round(this.rh * this.selW / this.rw);
-            let ry = this.getCY(e);  // 当前真实的y
-            if(ry > this.sy){
-                return sclH + this.sy;
-            }else{
-                return this.sy - sclH;
+        getScaleCYWithCX(e, type){
+            if(type == 'lng'){
+                let nLW = Math.abs(this.elx - this.slx);
+                let sclH = Math.round(this.rlh * nLW / this.rlw);
+                let ry = this.getCY(e);  // 当前真实的y
+                if(ry > this.sly){
+                    return sclH + this.sly;
+                }else{
+                    return this.sly - sclH;
+                }
+            }else if(type == 'hr'){
+                let nLW = Math.abs(this.ehx - this.shx);
+                let sclH = Math.round(this.rhh * nLW / this.rhw);
+                let ry = this.getCY(e);  // 当前真实的y
+                if(ry > this.shy){
+                    return sclH + this.shy;
+                }else{
+                    return this.shy - sclH;
+                }
             }
+
         },
-        cmosDown(e){
+        cmosDownL(e){
             this.bMosDown = true;
-            if(!this.mainObj){
-                this.mainObj = document.getElementById('step1-main');
+            if(!this.mainObjL){
+                this.mainObjL = document.getElementById('step1-main-lng');
             }
-            if(!this.canvas){
-                this.canvas = document.getElementById('canvas');
-                this.cnvSX = this.canvas.offsetLeft - this.mainObj.offsetLeft;
-                this.cnvSY = this.canvas.offsetTop - this.mainObj.offsetTop;
-                this.cnvEX = this.canvas.width + this.cnvSX;
-                this.cnvEY = this.canvas.height + this.cnvSY;
+            if(!this.canvasL){
+                this.canvasL = document.getElementById('canvas-lng');
+                this.cnvSLX = this.canvasL.offsetLeft;  // - this.mainObjL.offsetLeft
+                this.cnvSLY = this.canvasL.offsetTop;  // - this.mainObjL.offsetTop
+                this.cnvELX = this.canvasL.width + this.cnvSLX;
+                this.cnvELY = this.canvasL.height + this.cnvSLY;
             }
-            if(!this.ctx){
-                this.ctx = this.canvas.getContext('2d');
-                this.ctx.fillStyle = '#ff0000';
-                this.ctx.strokeStyle = '#f30101'
+            if(!this.ctxL){
+                this.ctxL = this.canvasL.getContext('2d');
+                this.ctxL.fillStyle = '#ff0000';
+                this.ctxL.strokeStyle = '#f30101'
             }
-            this.ex = this.sx = this.getCX(e);
-            this.ey = this.sy = this.getCY(e);
-            this.clearCanvas();
+            this.elx = this.slx = this.getCX(e);
+            this.ely = this.sly = this.getCY(e);
+            this.clearCanvas('lng');
         },
-        cmosMove(e){
+        cmosMoveL(e){
             if(this.bMosDown){
-                this.ex = this.getCX(e);
-                this.ey = this.getScaleCYWithCX(e);
-                this.clearCanvas();
-                this.ctx.setLineDash([6]);
-                this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
-                this.ctx.fillStyle="rgba(220,158,20,0.81)";
-                this.ctx.fillRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
+                this.elx = this.getCX(e);
+                this.ely = this.getScaleCYWithCX(e, 'lng');
+                this.clearCanvas('lng');
+                this.ctxL.setLineDash([6]);
+                this.ctxL.strokeRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+                this.ctxL.fillStyle="rgba(220,158,20,0.81)";
+                this.ctxL.fillRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
             }
         },
-        cmosUp(e){
+        cmosUpL(e){
             this.bMosDown = false;
-            this.ex = this.getCX(e);
-            this.ey = this.getScaleCYWithCX(e);
-            this.clearCanvas();
-            this.ctx.setLineDash([6]);
-            this.ctx.strokeRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
-            this.ctx.fillStyle="rgba(220,158,20,0.81)";
-            this.ctx.fillRect(this.sx, this.sy, this.ex-this.sx, this.ey-this.sy);
+            this.elx = this.getCX(e);
+            this.ely = this.getScaleCYWithCX(e, 'lng');
+            this.clearCanvas('lng');
+            this.ctxL.setLineDash([6]);
+            this.ctxL.strokeRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+            this.ctxL.fillStyle="rgba(220,158,20,0.81)";
+            this.ctxL.fillRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
         },
+        cmosDownH(e){
+            this.bMosDown = true;
+            if(!this.mainObjH){
+                this.mainObjH = document.getElementById('step1-main-hr');
+            }
+            if(!this.canvasH){
+                this.canvasH = document.getElementById('canvas-hr');
+                this.cnvSHX = this.canvasH.offsetLeft;  //  - this.mainObjH.offsetLeft
+                this.cnvSHY = this.canvasH.offsetTop;  //  - this.mainObjH.offsetTop
+                this.cnvEHX = this.canvasH.width + this.cnvSHX;
+                this.cnvEHY = this.canvasH.height + this.cnvSHY;
+            }
+            if(!this.ctxH){
+                this.ctxH = this.canvasH.getContext('2d');
+                this.ctxH.fillStyle = '#ff0000';
+                this.ctxH.strokeStyle = '#f30101'
+            }
+            this.ehx = this.shx = this.getCX(e);
+            this.ehy = this.shy = this.getCY(e);
+            this.clearCanvas('hr');
+        },
+        cmosMoveH(e){
+            if(this.bMosDown){
+                this.ehx = this.getCX(e);
+                this.ehy = this.getScaleCYWithCX(e, 'hr');
+                this.clearCanvas('hr');
+                this.ctxH.setLineDash([6]);
+                this.ctxH.strokeRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+                this.ctxH.fillStyle="rgba(220,158,20,0.81)";
+                this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+            }
+        },
+        cmosUpH(e){
+            this.bMosDown = false;
+            this.ehx = this.getCX(e);
+            this.ehy = this.getScaleCYWithCX(e, 'hr');
+            this.clearCanvas('hr');
+            this.ctxH.setLineDash([6]);
+            this.ctxH.strokeRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+            this.ctxH.fillStyle="rgba(220,158,20,0.81)";
+            this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+        },
+        tmpChanged(idx){
+            let curTmp = this.tmpLst[idx];
+            this.tmpLW = curTmp.showW;
+            this.tmpLH = curTmp.showH;
+            this.tmpHW = curTmp.showH;
+            this.tmphH = curTmp.showW;
+        },
+        imgRateChanged(idx){
+            let curImgRate = this.imgRateLst[idx];
+            this.rlw = curImgRate.rlw;
+            this.rlh = curImgRate.rlh;
+            if(this.tmpLW < this.tmpLH){
+                let tv = this.rlw;
+                this.rlw = this.rlh;
+                this.rlh = tv;
+            }
+        },
+        tabActive(t){
+            if(t == 'long'){
+                return this.bShowLong;
+            }else{
+                return !this.bShowLong;
+            }
+        },
+        selectTab(e){
+            if(e.target.id == 'tab-head-itm-long'){
+                this.bShowLong = true;
+            }else if(e.target.id == 'tab-head-itm-horizon'){
+                this.bShowLong = false;
+            }
+        },
+        selectSelfTmp(type){
+            let trgtId = event.target.id
+            let selPath = event.currentTarget.files[0]
+            if (!selPath) {
+                return
+            }
+            if (trgtId == 'selfLngTmp') {
+                this.confTmpLngUrl = selPath.path;
+                let canv =document.getElementById('canvas-lng');
+                let ctx = canv.getContext('2d');
+                let newImg = new Image();
+                newImg.src = this.confTmpLngUrl;
+                newImg.onload = ()=>{
+                    ctx.drawImage(newImg, 0, 0);
+                }
+            }else if (trgtId == 'selfHrTmp') {
+                this.confTmpHrUrl = selPath.path;
+                let canv =document.getElementById('canvas-hr');
+                let ctx = canv.getContext('2d');
+                let newImg = new Image();
+                newImg.src = this.confTmpHrUrl;
+                newImg.onload = ()=>{
+                    ctx.drawImage(newImg, 0, 0);
+                }
+            }
+
+        }
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
@@ -231,9 +533,12 @@ export default {
 }
 
 .step1-container {
-    height: 430px;
+    height: 450px;
 }
-
+.step1-main-show{
+    min-width: 520px;
+    width: 80%;
+}
 .step1-main {
     margin-right: 3px;
     border: 1px solid #A5A060;
@@ -241,18 +546,19 @@ export default {
     -webkit-border-radius: 6px;
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
-    padding: 10px;
     text-align: center;
-    height: 380px;
+    height: 80%;
+    min-height: 400px;
     cursor: crosshair;
+    position: relative;
 }
-#canvas {
+.canvas {
     background: #d3dce6;
     border: 1px solid;
-    margin: 0 auto;
-    position: relative;
+    /*margin: 0 auto;*/
+    position: absolute;
+    left: 50%;
     top: 50%;
-    margin-top: -150px;
 }
 .data-tips{
     margin-right: 3px;
@@ -275,6 +581,8 @@ export default {
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     line-height: 40px;
+    min-width: 240px;
+    width: 20%;
 }
 
 .step1-aside .aside-tips {
@@ -287,5 +595,40 @@ export default {
     line-height: 40px;
     height: 40px;
 }
-
+.tmp-hv{
+    margin-top: 8px;
+    width: 100%;
+}
+.tab-head{
+    border-bottom: 1px solid #91a9ec;
+}
+.tab-head-itm{
+    display: inline-block;
+    width: 49%;
+    /*border-bottom: 1px solid #000;*/
+}
+.tab-active{
+    background: linear-gradient(to top, #91a9ec, #d3dce6);
+    border-radius: 3px;
+}
+.tab-show{
+    min-height: 50px;
+}
+.tmp-selector > label >  img{
+  width: 22px;
+  height: 18px;
+  position: relative;
+  top: -1px;
+  left:8px;
+  cursor: pointer;
+  background-color: #f3f3c9;
+  border-radius: 3px;
+}
+.tmp-selector > input[type='text']{
+  height: 22px;
+  max-width: 300px;
+  width: 60%;
+  background-color: #f7f7f7;
+  border-width: 0px;
+}
 </style>

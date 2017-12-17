@@ -2,9 +2,12 @@
 <div class="step1">
     <el-container class="step1-container">
         <div class="step1-main-show" v-show="tabActive('long')">
-            <div id="step1-main-lng" class="step1-main" v-on:mousedown="cmosDownL" v-on:mousemove="cmosMoveL" v-on:mouseup="cmosUpL">
+            <div id="step1-main-lng" class="step1-main"
+                v-on:mousedown="cmosDownL" v-on:mousemove="cmosMoveL" v-on:mouseup="cmosUpL">
+                <canvas id="canvas-lng-tmp" class="canvas" :width="tmpLW" :height="tmpLH"
+                    :style="styleCanvasSizeL" style="z-index: 0;"></canvas>
                 <canvas id="canvas-lng" class="canvas" :width="tmpLW" :height="tmpLH"
-                    :style="styleCanvasSizeL" ></canvas>
+                    :style="styleCanvasSizeL" style="z-index: 1;background:rgba(255,255,255,0)" ></canvas>
             </div>
             <div class="data-tips">
                 <span class="tips-item">起点：({{ slx }}, {{ sly }})</span>
@@ -13,9 +16,12 @@
             </div>
         </div>
         <div class="step1-main-show" v-show="tabActive('horizon')">
-            <div id="step1-main-hr" class="step1-main" v-on:mousedown="cmosDownH" v-on:mousemove="cmosMoveH" v-on:mouseup="cmosUpH">
+            <div id="step1-main-hr" class="step1-main"
+                v-on:mousedown="cmosDownH" v-on:mousemove="cmosMoveH" v-on:mouseup="cmosUpH">
+                <canvas id="canvas-hr-tmp" class="canvas" :width="tmpHW" :height="tmpHH"
+                    :style="styleCanvasSizeH"  style="z-index: 0;"></canvas>
                 <canvas id="canvas-hr" class="canvas" :width="tmpHW" :height="tmpHH"
-                    :style="styleCanvasSizeH" v-show="tabActive('horizon')"></canvas>
+                    :style="styleCanvasSizeH"  style="z-index: 1;background:rgba(255,255,255,0)"></canvas>
             </div>
             <div class="data-tips">
                 <span class="tips-item">起点：({{ shx }}, {{ shy }})</span>
@@ -53,7 +59,7 @@
                     <div class="tab-show" v-show="tabActive('long')">
                         <div class="">
                             <span>选择模板：</span>
-                            <el-select id="tmp-lng" v-model="selHrTmpIdx" placeholder="请选择" size="small" @change="selecDefTmp"
+                            <el-select id="tmp-lng" v-model="selHrTmpIdx" placeholder="请选择" size="small" @change="selecDefTmpL"
                                 style="width:120px; height:40px; line-height:40px;">
                                 <el-option v-for="(tmp, index) in defTmps.hr" :label="tmp.name" :value="index"></el-option>
                             </el-select>
@@ -72,7 +78,7 @@
                     <div class="tab-show" v-show="tabActive('horizon')">
                         <div class="">
                             <span>选择模板：</span>
-                            <el-select id="tmp-hr" v-model="selLngTmpIdx" placeholder="请选择" size="small" @change="selecDefTmp"
+                            <el-select id="tmp-hr" v-model="selLngTmpIdx" placeholder="请选择" size="small" @change="selecDefTmpH"
                                 style="width:120px; height:40px; line-height:40px;">
                                 <el-option v-for="(tmp, index) in defTmps.lng" :label="tmp.name" :value="index"></el-option>
                             </el-select>
@@ -114,9 +120,9 @@ export default {
             ehx: 0,
             ehy: 0,
             canvasL: null,
-            ctxL: null,
+            _ctxL: null,
             canvasH: null,
-            ctxH: null,
+            _ctxH: null,
             mainObjL: null,
             mainObjH: null,
             cnvSLX: 0,
@@ -133,6 +139,24 @@ export default {
         }
     },
     computed: {
+        ctxL(){
+            if(!this._ctxL){
+                let canvasL = document.getElementById('canvas-lng');
+                this._ctxL = canvasL.getContext('2d');
+                return this._ctxL;
+            }else{
+                return this._ctxL
+            }
+        },
+        ctxH(){
+            if(!this._ctxH){
+                let canvasH = document.getElementById('canvas-hr');
+                this._ctxH = canvasH.getContext('2d');
+                return this._ctxH;
+            }else{
+                return this._ctxH
+            }
+        },
         /***** 纵向模板  ****/
         tmpLW:{
             get() {
@@ -504,8 +528,9 @@ export default {
         // 在指定canvas中展示指定图片url
         showImgInCanv(type){
             if(type == 'lng'){
-                let canv =document.getElementById('canvas-lng');
+                let canv =document.getElementById('canvas-lng-tmp');
                 let ctx = canv.getContext('2d');
+                ctx.clearRect(0, 0, this.tmpLW, this.tmpLH);
                 let newImg = new Image();
                 newImg.src = this.confTmpLngUrl;
                 newImg.width = this.tmpLW;
@@ -514,8 +539,9 @@ export default {
                     ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
                 }
             }else if(type == 'hr'){
-                let canv =document.getElementById('canvas-hr');
+                let canv =document.getElementById('canvas-hr-tmp');
                 let ctx = canv.getContext('2d');
+                ctx.clearRect(0, 0, this.tmpHW, this.tmpHH);
                 let newImg = new Image();
                 newImg.src = this.confTmpHrUrl;
                 newImg.width = this.tmpHW;
@@ -525,19 +551,17 @@ export default {
                 }
             }
         },
-        // 选择默认模板
-        selecDefTmp(idx){
-            // 纵向
-            if(idx == 0){
-                let tmp = this.defTmps.lng[idx];
-                this.confTmpLngUrl = tmp.url;
-                this.showImgInCanv('lng');
-            // 横向
-            }else if(idx == 1){
-                let tmp = this.defTmps.hr[idx];
-                this.confTmpHrUrl = tmp.url;
-                this.showImgInCanv('hr');
-            }
+        // 选择默认模板   纵向
+        selecDefTmpL(idx){
+            let tmp = this.defTmps.lng[idx];
+            this.confTmpLngUrl = tmp.url;
+            this.showImgInCanv('lng');
+        },
+        // 选择默认模板   横向
+        selecDefTmpH(idx){
+            let tmp = this.defTmps.hr[idx];
+            this.confTmpHrUrl = tmp.url;
+            this.showImgInCanv('hr');
         },
         // 选择自定义模板
         selectSelfTmp(){

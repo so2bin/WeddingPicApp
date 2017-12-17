@@ -66,7 +66,7 @@ const DefaultTemplates = {
     hr: [
         {
             name: "3×2默认模板",
-            url: "\\static\\static\\img\\template\\hr_tmp_32.png",
+            url: "\\static\\img\\template\\hr_tmp_32.png",
         },
         {
             name: "2×1默认模板",

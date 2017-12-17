@@ -1,17 +1,18 @@
 let tmplst = require('./Tmplst.js')
-let dftTmp = tmplst.default.state.tmpLst[0];
+let dftTmpLng = tmplst.default.state.tmpLst.lng[0];
+let dftTmpHr = tmplst.default.state.tmpLst.hr[0];
 let dftImgRate = tmplst.default.state.imgRate[0];
 
 const state = {
   step1: {
       /********  横向模板 ***********/
       lng: {
-          // 横向模板相关固有属性
+          // 纵向模板相关固有属性
           tmpUrl: "",
-          tmpW: dftTmp.showW,
-          tmpH: dftTmp.showH,
-          rw: dftImgRate.rw,
-          rh: dftImgRate.rh,
+          tmpW: dftTmpLng.showW,
+          tmpH: dftTmpLng.showH,
+          rw: dftImgRate.rh,
+          rh: dftImgRate.rw,
           // 用户选择展示区域
           sx: 0,
           sy: 0,
@@ -22,8 +23,8 @@ const state = {
       hr: {
           // 横向模板相关固有属性
           tmpUrl: "",
-          tmpW: dftTmp.showW,
-          tmpH: dftTmp.showH,
+          tmpW: dftTmpHr.showW,
+          tmpH: dftTmpHr.showH,
           rw: dftImgRate.rw,
           rh: dftImgRate.rh,
           // 用户选择展示区域

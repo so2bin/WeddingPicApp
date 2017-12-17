@@ -44,18 +44,21 @@
             </div>
             <div class="tmp-hv">
                 <div class="tmp-tab">
+                    <!-- 切换显示纵向/横向模板  -->
                     <div class="tab-head" @click="selectTab">
                         <span id="tab-head-itm-long" class="tab-head-itm" :class="{'tab-active': bShowLong}">纵向</span>
                         <span id="tab-head-itm-horizon"  class="tab-head-itm" :class="{'tab-active': !bShowLong}">横向</span>
                     </div>
+                    <!--  纵向模板设置  -->
                     <div class="tab-show" v-show="tabActive('long')">
                         <div class="">
                             <span>选择模板：</span>
-                            <el-select v-model="selHrTmpIdx" placeholder="请选择" size="small" @change="imgRateChanged"
+                            <el-select id="tmp-lng" v-model="selHrTmpIdx" placeholder="请选择" size="small" @change="selecDefTmp"
                                 style="width:120px; height:40px; line-height:40px;">
-                                <el-option v-for="(tmp, index) in defTmps.horiz" :label="tmp.name" :value="index"></el-option>
+                                <el-option v-for="(tmp, index) in defTmps.hr" :label="tmp.name" :value="index"></el-option>
                             </el-select>
                         </div>
+                        <!--  自定义选择模板文件  -->
                         <div class="tmp-selector" v-show="selHrTmpIdx==2">
                             <input type="file" id="selfLngTmp" style="display:none"
                              @change="selectSelfTmp">
@@ -65,14 +68,16 @@
                             </label>
                         </div>
                     </div>
+                    <!--  横向模板设置  -->
                     <div class="tab-show" v-show="tabActive('horizon')">
                         <div class="">
                             <span>选择模板：</span>
-                            <el-select v-model="selLngTmpIdx" placeholder="请选择" size="small" @change="imgRateChanged"
+                            <el-select id="tmp-hr" v-model="selLngTmpIdx" placeholder="请选择" size="small" @change="selecDefTmp"
                                 style="width:120px; height:40px; line-height:40px;">
-                                <el-option v-for="(tmp, index) in defTmps.long" :label="tmp.name" :value="index"></el-option>
+                                <el-option v-for="(tmp, index) in defTmps.lng" :label="tmp.name" :value="index"></el-option>
                             </el-select>
                         </div>
+                        <!--  自定义选择模板文件  -->
                         <div class="tmp-selector" v-show="selLngTmpIdx==2">
                             <input type="file" id="selfHrTmp"  style="display:none"
                              @change="selectSelfTmp">
@@ -128,7 +133,7 @@ export default {
         }
     },
     computed: {
-        /***** 横向模板  ****/
+        /***** 纵向模板  ****/
         tmpLW:{
             get() {
                 return this.$store.state.ProNew.step1.lng.tmpW
@@ -196,7 +201,7 @@ export default {
                 this.$store.commit('set_step1_lng', {type: 'selH', val})
             }
         },
-        /***** 纵向模板  ******/
+        /***** 横向模板  ******/
         tmpHW:{
             get() {
                 return this.$store.state.ProNew.step1.hr.tmpW
@@ -263,7 +268,7 @@ export default {
         },
 
         tmpLst(){
-            return this.$store.state.Tmplst.tmpLst;
+            return this.$store.state.Tmplst.tmpLst.lng;
         },
         imgRateLst(){
             return this.$store.state.Tmplst.imgRate;
@@ -312,6 +317,7 @@ export default {
                 }
             }
         },
+        /*****   画图相关  ******/
         getCX(e){
             if(e.target.id == 'canvas-lng' || e.target.id == 'canvas-hr'){
                 return e.offsetX;
@@ -460,6 +466,8 @@ export default {
             this.ctxH.fillStyle="rgba(220,158,20,0.81)";
             this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
         },
+        /*****   其它  ******/
+        // 选择项目尺寸）
         tmpChanged(idx){
             let curTmp = this.tmpLst[idx];
             this.tmpLW = curTmp.showW;
@@ -467,15 +475,16 @@ export default {
             this.tmpHW = curTmp.showH;
             this.tmphH = curTmp.showW;
         },
+        // 选择照片比例
         imgRateChanged(idx){
+            // 纵向为w小h大，imgRateLst配置默认为横向配置
             let curImgRate = this.imgRateLst[idx];
-            this.rlw = curImgRate.rlw;
-            this.rlh = curImgRate.rlh;
-            if(this.tmpLW < this.tmpLH){
-                let tv = this.rlw;
-                this.rlw = this.rlh;
-                this.rlh = tv;
-            }
+            // 纵向比例
+            this.rlw = curImgRate.rh;
+            this.rlh = curImgRate.rw;
+            // 横向比例
+            this.rhw = curImgRate.rw;
+            this.rhh = curImgRate.rh;
         },
         tabActive(t){
             if(t == 'long'){
@@ -484,6 +493,7 @@ export default {
                 return !this.bShowLong;
             }
         },
+        // 切换纵横
         selectTab(e){
             if(e.target.id == 'tab-head-itm-long'){
                 this.bShowLong = true;
@@ -491,7 +501,46 @@ export default {
                 this.bShowLong = false;
             }
         },
-        selectSelfTmp(type){
+        // 在指定canvas中展示指定图片url
+        showImgInCanv(type){
+            if(type == 'lng'){
+                let canv =document.getElementById('canvas-lng');
+                let ctx = canv.getContext('2d');
+                let newImg = new Image();
+                newImg.src = this.confTmpLngUrl;
+                newImg.width = this.tmpLW;
+                newImg.height = this.tmpLH;
+                newImg.onload = ()=>{
+                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                }
+            }else if(type == 'hr'){
+                let canv =document.getElementById('canvas-hr');
+                let ctx = canv.getContext('2d');
+                let newImg = new Image();
+                newImg.src = this.confTmpHrUrl;
+                newImg.width = this.tmpHW;
+                newImg.height = this.tmpHH;
+                newImg.onload = ()=>{
+                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                }
+            }
+        },
+        // 选择默认模板
+        selecDefTmp(idx){
+            // 纵向
+            if(idx == 0){
+                let tmp = this.defTmps.lng[idx];
+                this.confTmpLngUrl = tmp.url;
+                this.showImgInCanv('lng');
+            // 横向
+            }else if(idx == 1){
+                let tmp = this.defTmps.hr[idx];
+                this.confTmpHrUrl = tmp.url;
+                this.showImgInCanv('hr');
+            }
+        },
+        // 选择自定义模板
+        selectSelfTmp(){
             let trgtId = event.target.id
             let selPath = event.currentTarget.files[0]
             if (!selPath) {
@@ -503,8 +552,10 @@ export default {
                 let ctx = canv.getContext('2d');
                 let newImg = new Image();
                 newImg.src = this.confTmpLngUrl;
+                newImg.width = this.tmpLW;
+                newImg.height = this.tmpLH;
                 newImg.onload = ()=>{
-                    ctx.drawImage(newImg, 0, 0);
+                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
                 }
             }else if (trgtId == 'selfHrTmp') {
                 this.confTmpHrUrl = selPath.path;
@@ -512,12 +563,14 @@ export default {
                 let ctx = canv.getContext('2d');
                 let newImg = new Image();
                 newImg.src = this.confTmpHrUrl;
+                newImg.width = this.tmpHW;
+                newImg.height = this.tmpHH;
                 newImg.onload = ()=>{
-                    ctx.drawImage(newImg, 0, 0);
+                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
                 }
             }
 
-        }
+        },
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {

@@ -115,6 +115,7 @@ export default {
             pro_name: '',
             bInsertQRCode: '1',
             bMosDown: false,
+            // elx ehx ely ehy 为相对于canvas左上角的坐标
             elx: 0,
             ely: 0,
             ehx: 0,
@@ -192,6 +193,7 @@ export default {
             }
         },
         // 用户选择区域起点
+        // slx shx sly shy 为相对于canvas左上角的坐标
         slx:{
             get() {
                 return this.$store.state.ProNew.step1.lng.sx
@@ -290,7 +292,6 @@ export default {
                 this.$store.commit('set_step1_hr', {type: 'selH', val})
             }
         },
-
         tmpLst(){
             return this.$store.state.Tmplst.tmpLst.lng;
         },
@@ -384,24 +385,81 @@ export default {
                 };
             }
         },
+        // 当y在边界时需要这个函数来固定x
+        getScaleCXWithCY(sclH, e, type){
+            if(type == 'lng'){
+                let sclW = Math.round(this.rlw * sclH / this.rlh)
+                let rx = this.getCX(e);
+                if(rx > this.slx){
+                    return sclW + this.slx;
+                }else{
+                    return this.slx - sclW;
+                }
+            }else{
+                let sclW = Math.round(this.rhw * sclH / this.rhh)
+                let rx = this.getCX(e);
+                if(rx > this.shx){
+                    return sclW + this.shx;
+                }else{
+                    return this.shx - sclW;
+                }
+            }
+        },
+        // 位置变化时，以x为优先计算值
         getScaleCYWithCX(e, type){
             if(type == 'lng'){
                 let nLW = Math.abs(this.elx - this.slx);
                 let sclH = Math.round(this.rlh * nLW / this.rlw);
                 let ry = this.getCY(e);  // 当前真实的y
+                // y到达边缘，固定x
+                if(ry == this.canvasL.height){
+                    this.elx = Math.round(this.rlw * Math.abs(this.sly - ry) / this.slh);
+                }
+                let sclely = 0
                 if(ry > this.sly){
-                    return sclH + this.sly;
+                    sclely = sclH + this.sly;
                 }else{
-                    return this.sly - sclH;
+                    sclely = this.sly - sclH;
+                }
+
+                if(sclely > this.canvasL.height){
+                    // 终点y超出下界
+                    // 固定x
+                    this.elx = this.getScaleCXWithCY(Math.abs(this.canvasL.height - this.sly), e, type)
+                    return this.canvasL.height;
+                }
+                else if(sclely < 0){
+                    // 终点y超出上界
+                    // 固定x
+                    this.elx = this.getScaleCXWithCY(Math.abs(this.sly - 0), e, type)
+                    return 0;
+                }else {
+                    return sclely;
                 }
             }else if(type == 'hr'){
                 let nLW = Math.abs(this.ehx - this.shx);
                 let sclH = Math.round(this.rhh * nLW / this.rhw);
                 let ry = this.getCY(e);  // 当前真实的y
+                let sclehy = 0
                 if(ry > this.shy){
-                    return sclH + this.shy;
+                    sclehy = sclH + this.shy;
                 }else{
-                    return this.shy - sclH;
+                    sclehy =  this.shy - sclH;
+                }
+
+                if(sclehy > this.canvasH.height){
+                    // 终点y超出下界
+                    // 固定x
+                    this.ehx = this.getScaleCXWithCY(Math.abs(this.canvasH.height - this.shy), e, type)
+                    return this.canvasH.height;
+                }
+                else if(sclehy < 0){
+                    // 终点y超出上界
+                    // 固定x
+                    this.ehx = this.getScaleCXWithCY(Math.abs(this.shy - 0), e, type)
+                    return 0;
+                }else {
+                    return sclehy;
                 }
             }
 
@@ -497,7 +555,7 @@ export default {
             this.tmpLW = curTmp.showW;
             this.tmpLH = curTmp.showH;
             this.tmpHW = curTmp.showH;
-            this.tmphH = curTmp.showW;
+            this.tmpHH = curTmp.showW;
         },
         // 选择照片比例
         imgRateChanged(idx){
@@ -631,7 +689,7 @@ export default {
 }
 .canvas {
     background: #d3dce6;
-    border: 1px solid;
+    /* border: 1px solid; */
     /*margin: 0 auto;*/
     position: absolute;
     left: 50%;

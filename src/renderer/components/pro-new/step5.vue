@@ -14,6 +14,7 @@
         </div>
         <div class="pay-total">
         </div>
+        <slot name='test'></slot>
     </div>
 </template>
 

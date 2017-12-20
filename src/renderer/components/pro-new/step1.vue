@@ -101,6 +101,7 @@
                     <el-radio v-model="bInsertQRCode" label="2">不用二维码</el-radio>
                 </template>
             </div>
+            <slot name='test'></slot>
         </el-aside>
         </el-container>
     </div>

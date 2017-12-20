@@ -37,6 +37,7 @@
                 <el-input v-model="pro_company_addr" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
+            <slot name='test'></slot>
         </el-aside>
     </el-container>
 </div>

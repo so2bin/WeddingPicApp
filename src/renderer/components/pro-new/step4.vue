@@ -48,6 +48,7 @@
           <div class="print-btn">
               <el-button @click.native="gotoPrint" size="mini" :loading="bPrinting">自动打印</el-button>
           </div>
+          <slot name='test'></slot>
         </div>
     </div>
 </template>

@@ -20,6 +20,7 @@
                     </div>
                   </div>
               </div>
+              <slot name='test'></slot>
         </el-aside>
     </el-container>
 </div>

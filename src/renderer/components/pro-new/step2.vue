@@ -10,10 +10,6 @@
             </div>
         </el-main>
         <el-aside class="step2-aside" width="37%">
-            <div class="step2-row">
-                <span class="aside-tips">项目名称：</span>
-                <el-input v-model="pro_name" placeholder="请输入内容" size="small" style="width:120px; height:40px; line-height:40px;"></el-input>
-            </div>
               <div class="pic-filter">
                   <div class="pic-filter-blightness">
                     <div class="block">
@@ -85,8 +81,12 @@ export default {
     },
     formatTooltip (val) {
       return val / 100
-    }
-  }
+    },
+  },
+  beforeRouteEnter (to, from, next) {
+    next(vm => {
+    })
+  },
 }
 </script>
 

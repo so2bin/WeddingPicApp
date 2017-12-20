@@ -65,6 +65,10 @@ const ImgRate = [
 const DefaultTemplates = {
     hr: [
         {
+            name: "无",
+            url: null,
+        },
+        {
             name: "3×2默认模板",
             url: "\\static\\img\\template\\hr_tmp_32.png",
         },
@@ -78,6 +82,10 @@ const DefaultTemplates = {
         },
     ],
     lng: [
+        {
+            name: "无",
+            url: null,
+        },
         {
             name: "2×3默认模板",
             url: "\\static\\img\\template\\lng_tmp_23.png",

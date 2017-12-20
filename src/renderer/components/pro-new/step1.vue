@@ -65,7 +65,7 @@
                             </el-select>
                         </div>
                         <!--  自定义选择模板文件  -->
-                        <div class="tmp-selector" v-show="selHrTmpIdx==2">
+                        <div class="tmp-selector" v-show="selHrTmpIdx==3">
                             <input type="file" id="selfLngTmp" style="display:none"
                              @change="selectSelfTmp">
                             <input type="text" name=""  :value="confTmpLngUrl">
@@ -84,11 +84,11 @@
                             </el-select>
                         </div>
                         <!--  自定义选择模板文件  -->
-                        <div class="tmp-selector" v-show="selLngTmpIdx==2">
+                        <div class="tmp-selector" v-show="selLngTmpIdx==3">
                             <input type="file" id="selfHrTmp"  style="display:none"
                              @change="selectSelfTmp">
                             <input type="text" name="" :value="confTmpHrUrl">
-                            <label for="selfHzTmp">
+                            <label for="selfHrTmp">
                               <img src="/static/img/icons/folder.svg" alt="">
                             </label>
                         </div>
@@ -110,16 +110,8 @@
 export default {
     data () {
         return {
-            selTmp: 0,
-            selImgRate: 0,
-            pro_name: '',
             bInsertQRCode: '1',
             bMosDown: false,
-            // elx ehx ely ehy 为相对于canvas左上角的坐标
-            elx: 0,
-            ely: 0,
-            ehx: 0,
-            ehy: 0,
             canvasL: null,
             _ctxL: null,
             canvasH: null,
@@ -136,10 +128,36 @@ export default {
             cnvEHY: 0,
             bShowLong: true,
             selHrTmpIdx: 0,
-            selLngTmpIdx: 0
+            selLngTmpIdx: 0,
         }
     },
     computed: {
+        /**  项目相关参数  **/
+        pro_name: {
+            get(){
+                return this.$store.state.ProNew.step1.proName;
+            },
+            set(val){
+                this.$store.commit('set_pro_info', {type: 'proname', val});
+            }
+        },
+        selImgRate: {
+            get(){
+                return this.$store.state.ProNew.step1.proImgSizeIdx;
+            },
+            set(val){
+                this.$store.commit('set_pro_info', {type: 'proimgidx', val});
+            }
+        },
+        selTmp: {
+            get(){
+                return this.$store.state.ProNew.step1.proSizeIdx;
+            },
+            set(val){
+                this.$store.commit('set_pro_info', {type: 'prosizeidx', val});
+            }
+        },
+
         ctxL(){
             if(!this._ctxL){
                 let canvasL = document.getElementById('canvas-lng');
@@ -210,6 +228,22 @@ export default {
                 this.$store.commit('set_step1_lng', {type: 'sy', val})
             }
         },
+        elx: {
+            get() {
+                return this.$store.state.ProNew.step1.lng.ex
+            },
+            set(val) {
+                this.$store.commit('set_step1_lng', {type: 'ex', val})
+            }
+        },
+        ely: {
+            get() {
+                return this.$store.state.ProNew.step1.lng.ey
+            },
+            set(val) {
+                this.$store.commit('set_step1_lng', {type: 'ey', val})
+            }
+        },
         //  用户选择区域 W H
         selLW:{
             get() {
@@ -274,6 +308,22 @@ export default {
             },
             set(val) {
                 this.$store.commit('set_step1_hr', {type: 'sy', val})
+            }
+        },
+        ehx: {
+            get() {
+                return this.$store.state.ProNew.step1.hr.ex
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'ex', val})
+            }
+        },
+        ehy: {
+            get() {
+                return this.$store.state.ProNew.step1.hr.ey
+            },
+            set(val) {
+                this.$store.commit('set_step1_hr', {type: 'ey', val})
             }
         },
         selHW:{
@@ -489,22 +539,14 @@ export default {
             if(this.bMosDown){
                 this.elx = this.getCX(e);
                 this.ely = this.getScaleCYWithCX(e, 'lng');
-                this.clearCanvas('lng');
-                this.ctxL.setLineDash([6]);
-                this.ctxL.strokeRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
-                this.ctxL.fillStyle="rgba(220,158,20,0.81)";
-                this.ctxL.fillRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+                this.drawSelRect('lng');
             }
         },
         cmosUpL(e){
             this.bMosDown = false;
             this.elx = this.getCX(e);
             this.ely = this.getScaleCYWithCX(e, 'lng');
-            this.clearCanvas('lng');
-            this.ctxL.setLineDash([6]);
-            this.ctxL.strokeRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
-            this.ctxL.fillStyle="rgba(220,158,20,0.81)";
-            this.ctxL.fillRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+            this.drawSelRect('lng');
         },
         cmosDownH(e){
             this.bMosDown = true;
@@ -531,22 +573,14 @@ export default {
             if(this.bMosDown){
                 this.ehx = this.getCX(e);
                 this.ehy = this.getScaleCYWithCX(e, 'hr');
-                this.clearCanvas('hr');
-                this.ctxH.setLineDash([6]);
-                this.ctxH.strokeRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
-                this.ctxH.fillStyle="rgba(220,158,20,0.81)";
-                this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+                this.drawSelRect('hr');
             }
         },
         cmosUpH(e){
             this.bMosDown = false;
             this.ehx = this.getCX(e);
             this.ehy = this.getScaleCYWithCX(e, 'hr');
-            this.clearCanvas('hr');
-            this.ctxH.setLineDash([6]);
-            this.ctxH.strokeRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
-            this.ctxH.fillStyle="rgba(220,158,20,0.81)";
-            this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+            this.drawSelRect('hr');
         },
         /*****   其它  ******/
         // 选择项目尺寸）
@@ -589,24 +623,44 @@ export default {
                 let canv =document.getElementById('canvas-lng-tmp');
                 let ctx = canv.getContext('2d');
                 ctx.clearRect(0, 0, this.tmpLW, this.tmpLH);
-                let newImg = new Image();
-                newImg.src = this.confTmpLngUrl;
-                newImg.width = this.tmpLW;
-                newImg.height = this.tmpLH;
-                newImg.onload = ()=>{
-                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                if(this.confTmpLngUrl){
+                    let newImg = new Image();
+                    newImg.src = this.confTmpLngUrl;
+                    newImg.width = this.tmpLW;
+                    newImg.height = this.tmpLH;
+                    newImg.onload = ()=>{
+                        ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                    }
                 }
             }else if(type == 'hr'){
                 let canv =document.getElementById('canvas-hr-tmp');
                 let ctx = canv.getContext('2d');
                 ctx.clearRect(0, 0, this.tmpHW, this.tmpHH);
-                let newImg = new Image();
-                newImg.src = this.confTmpHrUrl;
-                newImg.width = this.tmpHW;
-                newImg.height = this.tmpHH;
-                newImg.onload = ()=>{
-                    ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                if(this.confTmpHrUrl){
+                    let newImg = new Image();
+                    newImg.src = this.confTmpHrUrl;
+                    newImg.width = this.tmpHW;
+                    newImg.height = this.tmpHH;
+                    newImg.onload = ()=>{
+                        ctx.drawImage(newImg, 0, 0, newImg.width, newImg.height);
+                    }
                 }
+            }
+        },
+        // draw selected rect in canvas
+        drawSelRect(type){
+            if(type == 'lng'){
+                this.clearCanvas('lng');
+                this.ctxL.setLineDash([6]);
+                this.ctxL.strokeRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+                this.ctxL.fillStyle="rgba(220,158,20,0.81)";
+                this.ctxL.fillRect(this.slx, this.sly, this.elx-this.slx, this.ely-this.sly);
+            }else if(type == 'hr'){
+                this.clearCanvas('hr');
+                this.ctxH.setLineDash([6]);
+                this.ctxH.strokeRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
+                this.ctxH.fillStyle="rgba(220,158,20,0.81)";
+                this.ctxH.fillRect(this.shx, this.shy, this.ehx-this.shx, this.ehy-this.shy);
             }
         },
         // 选择默认模板   纵向
@@ -630,7 +684,7 @@ export default {
             }
             if (trgtId == 'selfLngTmp') {
                 this.confTmpLngUrl = selPath.path;
-                let canv =document.getElementById('canvas-lng');
+                let canv =document.getElementById('canvas-lng-tmp');
                 let ctx = canv.getContext('2d');
                 let newImg = new Image();
                 newImg.src = this.confTmpLngUrl;
@@ -641,7 +695,7 @@ export default {
                 }
             }else if (trgtId == 'selfHrTmp') {
                 this.confTmpHrUrl = selPath.path;
-                let canv =document.getElementById('canvas-hr');
+                let canv =document.getElementById('canvas-hr-tmp');
                 let ctx = canv.getContext('2d');
                 let newImg = new Image();
                 newImg.src = this.confTmpHrUrl;
@@ -656,7 +710,10 @@ export default {
     },
     beforeRouteEnter (to, from, next) {
         next(vm => {
-
+            vm.showImgInCanv('lng');
+            vm.showImgInCanv('hr');
+            vm.drawSelRect('lng');
+            vm.drawSelRect('hr');
         })
     },
 }

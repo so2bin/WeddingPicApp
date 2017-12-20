@@ -5,6 +5,12 @@ let dftImgRate = tmplst.default.state.imgRate[0];
 
 const state = {
   step1: {
+      // 项目名称
+      proName: "",
+      // 项目名称
+      proSizeIdx: 0,
+      // 照片尺寸
+      proImgSizeIdx: 0,
       /********  横向模板 ***********/
       lng: {
           // 纵向模板相关固有属性
@@ -16,6 +22,8 @@ const state = {
           // 用户选择展示区域
           sx: 0,
           sy: 0,
+          ex: 0,
+          ey: 0,
           selW: 0,
           selH: 0
       },
@@ -30,6 +38,8 @@ const state = {
           // 用户选择展示区域
           sx: 0,
           sy: 0,
+          ex: 0,
+          ey: 0,
           selW: 0,
           selH: 0
       }
@@ -53,6 +63,15 @@ const state = {
 }
 
 const mutations = {
+  set_pro_info(state, {type, val}){
+      if(type == 'proname'){
+          state.step1.proName = val;
+      }else if(type == 'prosizeidx'){
+          state.step1.proSizeIdx = val;
+      }else if(type == 'proimgidx'){
+          state.step1.proImgSizeIdx = val;
+      }
+  },
   set_step1_lng(state, {type, val}){
       if(type == 'tmpUrl'){
           state.step1.lng.tmpUrl = val
@@ -68,6 +87,10 @@ const mutations = {
           state.step1.lng.sx = val
       }else if (type == 'sy') {
           state.step1.lng.sy = val
+      }else if (type == 'ex') {
+          state.step1.lng.ex = val
+      }else if (type == 'ey') {
+          state.step1.lng.ey = val
       }else if (type == 'selW') {
           state.step1.lng.selW = val
       }else if (type == 'selH') {
@@ -89,6 +112,10 @@ const mutations = {
           state.step1.hr.sx = val
       }else if (type == 'sy') {
           state.step1.hr.sy = val
+      }else if (type == 'ex') {
+          state.step1.hr.ex = val
+      }else if (type == 'ey') {
+          state.step1.hr.ey = val
       }else if (type == 'selW') {
           state.step1.hr.selW = val
       }else if (type == 'selH') {

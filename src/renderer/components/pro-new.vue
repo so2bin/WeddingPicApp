@@ -1,13 +1,13 @@
 <template lang="">
 <div class="pro-new">
     <!-- 步骤组件 -->
-    <el-steps :space="100" :active="step" :align-center="true" class="step">
-        <el-step title="基础设置" description=""></el-step>
-        <el-step title="图片设置" description=""></el-step>
-        <el-step title="微信设置" description=""></el-step>
-        <el-step title="打印设置" description=""></el-step>
-        <el-step title="容量选择" description=""></el-step>
-        <el-step title="完成" description=""></el-step>
+    <el-steps  :active="step" finish-status='success' simple class="step">
+        <el-step title="基础" ></el-step>
+        <el-step title="图片" ></el-step>
+        <el-step title="微信" ></el-step>
+        <el-step title="打印" ></el-step>
+        <el-step title="容量" ></el-step>
+        <el-step title="完成" ></el-step>
     </el-steps>
 
     <!-- 视图 -->
@@ -16,10 +16,10 @@
     <!-- </transition> -->
 
     <div class="but-group">
-        <el-button @click.native.prevent="handlePreview" v-show="preview">预览</el-button>
-        <el-button @click.native.prevent="handlePreStep" v-show="preStep">上一步</el-button>
-        <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary">下一步</el-button>
-        <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary">发布</el-button>
+        <el-button @click.native.prevent="handlePreview" v-show="preview" size='mini'>预览</el-button>
+        <el-button @click.native.prevent="handlePreStep" v-show="preStep" size='mini'>上一步</el-button>
+        <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary" size='mini'>下一步</el-button>
+        <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary" size='mini'>发布</el-button>
     </div>
 </div>
 </template>
@@ -30,21 +30,25 @@ export default {
   name: 'pro-new',
   data: function () {
     return {
-      isRouter: false,
-      preview: false,
-      preStep: false,
-      nextStep: true,
-      publish: false,
-      step: 1
+        isRouter: false,
+        preview: false,
+        preStep: false,
+        nextStep: true,
+        publish: false,
+        step: 1,
     }
   },
   methods: {
+    commitStepBtn(){
+        this.$store.commit('set_stepbtn', this.setBtn)
+    },
     handlePreview: function () {
       console.log('预览')
     },
     handlePreStep: function () {
       this.$router.go(-1)
-      this.step--
+      this.step--;
+      this.commitStepBtn();
       this.goStep(this.step)
       $('html,body').animate({
         scrollTop: 0
@@ -52,13 +56,11 @@ export default {
     },
     handleNextStep: function () {
       this.$router.push('/pronew/step' + (this.step + 1))
-      var _this = this
-      setTimeout(function () {
-        if (_this.isRouter) {
-          _this.step++
-          _this.goStep(_this.step)
-        }
-      })
+      if (this.isRouter) {
+          this.step++;
+          this.commitStepBtn();
+          this.goStep(this.step)
+      }
       $('html,body').animate({
         scrollTop: 0
       }, 100)
@@ -69,47 +71,54 @@ export default {
     goStep: function (n) {
       switch (n) {
         case 1:
-          this.preview = false
-          this.preStep = false
-          this.nextStep = true
-          this.publish = false
+          this.preview = false;
+          this.preStep = false;
+          this.nextStep = true;
+          this.publish = false;
+          this.commitStepBtn();
           break
         case 2:
-          this.preview = false
-          this.preStep = true
-          this.nextStep = true
-          this.publish = false
+          this.preview = false;
+          this.preStep = true;
+          this.nextStep = true;
+          this.publish = false;
+          this.commitStepBtn();
           break
         case 3:
-          this.preview = false
-          this.preStep = true
-          this.nextStep = true
-          this.publish = false
+          this.preview = false;
+          this.preStep = true;
+          this.nextStep = true;
+          this.publish = false;
+          this.commitStepBtn();
           break
         case 4:
-          this.preview = false
-          this.preStep = true
-          this.nextStep = true
-          this.publish = false
+          this.preview = false;
+          this.preStep = true;
+          this.nextStep = true;
+          this.publish = false;
+          this.commitStepBtn();
           break
         case 5:
-          this.preview = false
-          this.preStep = true
-          this.nextStep = true
-          this.publish = false
+          this.preview = false;
+          this.preStep = true;
+          this.nextStep = true;
+          this.publish = false;
+          this.commitStepBtn();
           break
         case 6:
-          this.preview = true
-          this.preStep = true
-          this.nextStep = false
-          this.publish = true
+          this.preview = true;
+          this.preStep = true;
+          this.nextStep = false;
+          this.publish = true;
+          this.commitStepBtn();
           break
       }
     }
   },
   watch: {
     '$route': function (to, from) {
-      this.isRouter = true
+      this.isRouter = true;
+      this.commitStepBtn();
     }
   }
 }
@@ -118,6 +127,10 @@ export default {
 <style lang="" scoped>
 .pro-new .router-link {
     color: #fff;
+}
+.step{
+    height: 10px;
+    background: #e9eef3;
 }
 
 .pro-new .but-group .el-button {

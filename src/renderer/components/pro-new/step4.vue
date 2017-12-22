@@ -45,10 +45,12 @@
               {{ prntr.printerName }}
             </el-checkbox>
           </div>
-          <div class="print-btn">
+          <!-- <div class="print-btn">
               <el-button @click.native="gotoPrint" size="mini" :loading="bPrinting">自动打印</el-button>
-          </div>
-          <slot name='test'></slot>
+          </div> -->
+          <!-- <div class="steps-control"> -->
+              <slot name='test'></slot>
+          <!-- </div> -->
         </div>
     </div>
 </template>
@@ -206,5 +208,13 @@ import { ipcRenderer } from 'electron'
 }
 .print-btn .el-button{
     float: right;
+}
+.el-aside {
+    position: relative;
+}
+.steps-control {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
 }
 </style>

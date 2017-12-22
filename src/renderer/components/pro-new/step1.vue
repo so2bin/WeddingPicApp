@@ -10,9 +10,9 @@
                     :style="styleCanvasSizeL" style="z-index: 1;background:rgba(255,255,255,0)" ></canvas>
             </div>
             <div class="data-tips">
-                <span class="tips-item">起点：({{ slx }}, {{ sly }})</span>
-                <span class="tips-item">宽：{{ selLW }}</span>
-                <span class="tips-item">高：{{ selLH }}</span>
+                <span class="tips-item">起点：({{ slx }}, {{ sly }})</span><br>
+                <span class="tips-item">宽：{{ selLW }}</span><br>
+                <span class="tips-item">高：{{ selLH }}</span><br>
             </div>
         </div>
         <div class="step1-main-show" v-show="tabActive('horizon')">
@@ -24,9 +24,9 @@
                     :style="styleCanvasSizeH"  style="z-index: 1;background:rgba(255,255,255,0)"></canvas>
             </div>
             <div class="data-tips">
-                <span class="tips-item">起点：({{ shx }}, {{ shy }})</span>
-                <span class="tips-item">宽：{{ selHW }}</span>
-                <span class="tips-item">高：{{ selHH }}</span>
+                <span class="tips-item">起点：({{ shx }}, {{ shy }})</span><br>
+                <span class="tips-item">宽：{{ selHW }}</span><br>
+                <span class="tips-item">高：{{ selHH }}</span><br>
             </div>
         </div>
         <el-aside class="step1-aside" width="37%">
@@ -101,7 +101,9 @@
                     <el-radio v-model="bInsertQRCode" label="2">不用二维码</el-radio>
                 </template>
             </div>
-            <slot name='test'></slot>
+            <div class="steps-control">
+                <slot name='test'></slot>
+            </div>
         </el-aside>
         </el-container>
     </div>
@@ -722,15 +724,16 @@ export default {
 
 <style lang="" scoped>
 .step1 {
-    padding: 10px 0px;
+    padding: 0px 0px;
 }
 
 .step1-container {
-    height: 450px;
+    height: 510px;
 }
 .step1-main-show{
     min-width: 520px;
     width: 80%;
+    position: relative;
 }
 .step1-main {
     margin-right: 3px;
@@ -740,8 +743,8 @@ export default {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
     text-align: center;
-    height: 80%;
-    min-height: 400px;
+    height: 100%;
+    min-height: 460px;
     cursor: crosshair;
     position: relative;
 }
@@ -755,15 +758,19 @@ export default {
 }
 .data-tips{
     margin-right: 3px;
-    height: 50px;
-    border: 1px solid #A5A060;
+    height: 60px;
+    /* border: 1px solid #A5A060; */
     border-top: 0px;
     text-align: left;
     padding-left: 5px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
 }
 .tips-item{
     padding-left: 8px;
-    line-height: 50px;
+    line-height: 20px;
+    font-size: 13px;
 }
 .step1-aside {
     padding: 10px 0px;
@@ -823,5 +830,13 @@ export default {
   width: 60%;
   background-color: #f7f7f7;
   border-width: 0px;
+}
+.el-aside {
+    position: relative;
+}
+.steps-control {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
 }
 </style>

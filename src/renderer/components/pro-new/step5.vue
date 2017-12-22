@@ -14,7 +14,9 @@
         </div>
         <div class="pay-total">
         </div>
-        <slot name='test'></slot>
+        <div class="steps-control">
+            <slot name='test'></slot>
+        </div>
     </div>
 </template>
 
@@ -83,5 +85,13 @@
 .pay-tips{
   padding-top: 10px;
   line-height: 10px;
+}
+.el-aside {
+    position: relative;
+}
+.steps-control {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
 }
 </style>

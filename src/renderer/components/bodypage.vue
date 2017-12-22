@@ -36,12 +36,12 @@ export default {
 
 <style lang="" scoped>
 .help-title {
-    height:80px;
-    line-height:80px;
+    height:40px;
+    line-height:40px;
     margin:0 0px;
 }
 .pic-show{
-    height: 490px;
+    height: 500px;
 }
 
 .time {

@@ -7,15 +7,15 @@ const tmplts = {
     lng: [
         {
             name: '4×6英寸（竖）',
-            showW: 260,
-            showH: 390,
+            showW: 320,
+            showH: 480,
             rw: 2,
             rh: 3
         },
         {
             name: '4×8英寸（竖）',
-            showW: 190,
-            showH: 380,
+            showW: 240,
+            showH: 480,
             rw: 1,
             rh: 2
         },
@@ -23,15 +23,15 @@ const tmplts = {
     hr: [
         {
             name: '6×4英寸（横）',
-            showW: 510,
-            showH: 340,
+            showW: 480,
+            showH: 320,
             rw: 3,
             rh: 2
         },
         {
             name: '8×4英寸（横）',
-            showW: 500,
-            showH: 250,
+            showW: 480,
+            showH: 240,
             rw: 2,
             rh: 1
         },

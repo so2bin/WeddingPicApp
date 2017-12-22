@@ -20,7 +20,9 @@
                     </div>
                   </div>
               </div>
-              <slot name='test'></slot>
+              <div class="steps-control">
+                  <slot name='test'></slot>
+              </div>
         </el-aside>
     </el-container>
 </div>
@@ -94,11 +96,12 @@ export default {
 <style lang="" scoped>
 
 .step2 {
-    padding: 10px 0px;
+    padding: 0px 0px;
+    height: 510px;
 }
 
 .step2-container {
-    height: 430px;
+    height: 500px;
 }
 
 .step2-main {
@@ -133,12 +136,20 @@ export default {
 }
 
 .origin-img > img {
-    height: 200px;
+    height: 235px;
     width: 100%;
 }
 
 .processed-img > img {
-    height: 200px;
+    height: 235px;
     width: 100%;
+}
+.el-aside {
+    position: relative;
+}
+.steps-control {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
 }
 </style>

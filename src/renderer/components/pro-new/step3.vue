@@ -1,8 +1,8 @@
 <template lang="">
-<div class="step2">
-    <el-container class="step2-container">
+<div class="step3">
+    <el-container class="step3-container">
       <el-container>
-        <el-main class="step2-main">
+        <el-main class="step3-main">
           <div class="wxpic wxpic-left">
             <wxindexLeft></wxindexLeft>
           </div>
@@ -11,33 +11,35 @@
           </div>
         </el-main>
       </el-container>
-        <el-aside class="step2-aside" width="37%">
-            <div class="step2-row">
+        <el-aside class="step3-aside" width="37%">
+            <div class="step3-row">
                 <span class="aside-tips">项目标题：</span>
                 <el-input v-model="pro_title" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
-            <div class="step2-row">
+            <div class="step3-row">
                 <span class="aside-tips">摄影师&nbsp;&nbsp;&nbsp;&nbsp;：</span>
                 <el-input v-model="pro_author" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
-            <div class="step2-row">
+            <div class="step3-row">
                 <span class="aside-tips">联系电话：</span>
                 <el-input v-model="pro_phone" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
-            <div class="step2-row">
+            <div class="step3-row">
                 <span class="aside-tips">公司名称：</span>
                 <el-input v-model="pro_company" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
-            <div class="step2-row">
+            <div class="step3-row">
                 <span class="aside-tips">公司地址：</span>
                 <el-input v-model="pro_company_addr" placeholder="请输入内容" size="small"
                 style="width:120px; height:40px; line-height:40px;"></el-input>
             </div>
-            <slot name='test'></slot>
+            <div class="steps-control">
+                <slot name='test'></slot>
+            </div>
         </el-aside>
     </el-container>
 </div>
@@ -123,13 +125,13 @@ export default {
 
 <style lang="" scoped>
 
-.step2 {
-    padding: 10px 0px;
+.step3 {
+    padding: 0px 0px;
 }
-.step2-container {
-    height: 430px;
+.step3-container {
+    height: 510px;
 }
-.step2-main {
+.step3-main {
     margin-right: 3px;
     border: 1px solid #A5A060;
     -moz-border-radius: 6px;
@@ -138,7 +140,7 @@ export default {
     padding: 10px;
     /*position: relative;*/
 }
-.step2-aside {
+.step3-aside {
     padding: 10px 0px;
     border: 1px solid #A5A060;
     box-shadow: rgba(0, 0, 0, 0.1) 0px 0px 8px;
@@ -148,12 +150,12 @@ export default {
     -webkit-border-radius: 6px;
     line-height: 36px;
 }
-.step2-aside .aside-tips {
+.step3-aside .aside-tips {
     float: left;
     padding-left: 18px;
     font-weight: 600;
 }
-.step2-aside .step2-row {
+.step3-aside .step3-row {
     width: 100%;
     line-height: 36px;
     height: 36px;
@@ -203,5 +205,13 @@ export default {
 }
 .wxpic-left{
   position: relative;;
+}
+.el-aside {
+    position: relative;
+}
+.steps-control {
+    position: absolute;
+    bottom: 0px;
+    text-align: center;
 }
 </style>

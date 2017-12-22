@@ -14,7 +14,7 @@
     <!-- <transition name="fade"> -->
         <router-view class="view">
             <span slot='test'>
-                <div class="but-group">
+                <div class="but-group" style="text-align:center;">
                     <el-button @click.native.prevent="handlePreview" v-show="preview" size='mini'>预览</el-button>
                     <el-button @click.native.prevent="handlePreStep" v-show="preStep" size='mini'>上一步</el-button>
                     <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary" size='mini'>下一步</el-button>
@@ -119,8 +119,11 @@ export default {
     color: #fff;
 }
 .step{
-    height: 10px;
+    height: 30px;
     background: #e9eef3;
+    padding: 0px 10px;
+    position: relative;
+    top:-10px;
 }
 
 .pro-new .but-group .el-button {

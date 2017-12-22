@@ -57,6 +57,7 @@ export default {
     background-color: #E9EEF3;
     color: #333;
     text-align: center;
+    height: 580px;
     /*line-height: 160px;*/
 }
 

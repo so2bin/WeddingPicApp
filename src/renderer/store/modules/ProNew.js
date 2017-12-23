@@ -16,6 +16,8 @@ const state = {
       proSizeIdx: 0,
       // 照片尺寸
       proImgSizeIdx: 0,
+      // 模板在上/在下  0: 在下(默认), 1: 在上
+      bReverse: '0',
       /********  横向模板 ***********/
       lng: {
           // 纵向模板相关固有属性
@@ -88,6 +90,9 @@ const mutations = {
           state.step1.proImgSizeIdx = val;
       }else if(type == 'step'){
           state.step1.step = val;
+      }
+      else if(type == 'bReverse'){
+          state.step1.bReverse = val;
       }
   },
   set_step1_lng(state, {type, val}){

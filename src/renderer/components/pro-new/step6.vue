@@ -80,6 +80,9 @@ let mkdirp = require('mkdirp')
             },
             uploadhistory(){
                 return this.imgfldrCopy + '/upload.txt';
+            },
+            bReverse(){
+                return this.$store.state.ProNew.step1.bReverse !== '0';  // '0'为默认模板在下
             }
         },
         methods: {
@@ -187,15 +190,6 @@ let mkdirp = require('mkdirp')
                         let filepath = path.join(_this.imgfldrCopy, imgName);
                         ipcRenderer.send('ipc-savebase64', {data:base64Str, filepath});
                         ipcRenderer.on('ipc-savebase64', (event, arg)=>{
-                            // if(arg.status === 0){
-                            //     _this.$http.get(_this.PRINTHOST + '/printImg?imgUrl=' + arg.filepath)
-                            //         .then((res) => {
-                            //             console.log('打印成功');
-                            //         })
-                            //         .catch((err) => {
-                            //             console.error(err);
-                            //         })
-                            // }
                         })
                     }
                 });
@@ -256,7 +250,8 @@ let mkdirp = require('mkdirp')
                             template: {
                                 lng: this.$store.state.ProNew.step1.lng,
                                 hr: this.$store.state.ProNew.step1.hr
-                            }
+                            },
+                            bReverse: this.bReverse
                         }
                         return this.$http.post(this.PRINTHOST+'/printImg', params);
                     }

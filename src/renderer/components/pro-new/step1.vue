@@ -48,6 +48,12 @@
                     <el-option v-for="(tmp, index) in imgRateLst" :label="tmp.name" :value="index"></el-option>
                 </el-select>
             </div>
+            <div class="step1-row">
+                <template>
+                    <el-radio v-model="bReverse" label="0">模板在下</el-radio>
+                    <el-radio v-model="bReverse" label="1">模板在上</el-radio>
+                </template>
+            </div>
             <div class="tmp-hv">
                 <div class="tmp-tab">
                     <!-- 切换显示纵向/横向模板  -->
@@ -95,12 +101,7 @@
                     </div>
                 </div>
             </div>
-            <div class="step1-row">
-                <template>
-                    <el-radio v-model="bInsertQRCode" label="1">使用二维码</el-radio>
-                    <el-radio v-model="bInsertQRCode" label="2">不用二维码</el-radio>
-                </template>
-            </div>
+
             <div class="steps-control">
                 <slot name='test'></slot>
             </div>
@@ -113,7 +114,6 @@
 export default {
     data () {
         return {
-            bInsertQRCode: '1',
             bMosDown: false,
             canvasL: null,
             _ctxL: null,
@@ -160,7 +160,6 @@ export default {
                 this.$store.commit('set_pro_info', {type: 'prosizeidx', val});
             }
         },
-
         ctxL(){
             if(!this._ctxL){
                 let canvasL = document.getElementById('canvas-lng');
@@ -177,6 +176,14 @@ export default {
                 return this._ctxH;
             }else{
                 return this._ctxH
+            }
+        },
+        bReverse: {
+            get(){
+                return this.$store.state.ProNew.step1.bReverse;
+            },
+            set(val){
+                this.$store.commit('set_pro_info', {type: 'bReverse', val});
             }
         },
         /***** 纵向模板  ****/

@@ -1,7 +1,10 @@
+let url = require('url')
 let tmplst = require('./Tmplst.js')
+let procnf = require('./ProCnf')
 let dftTmpLng = tmplst.default.state.tmpLst.lng[0];
 let dftTmpHr = tmplst.default.state.tmpLst.hr[0];
 let dftImgRate = tmplst.default.state.imgRate[0];
+let dftImgRealSize = tmplst.default.state.tmpRealSize[0];
 
 const state = {
   // 当前步骤
@@ -27,9 +30,12 @@ const state = {
           ex: 0,
           ey: 0,
           selW: 0,
-          selH: 0
+          selH: 0,
+          // 当前模板对应的真实的尺寸
+          realW: dftImgRealSize.w,
+          realH: dftImgRealSize.h,
       },
-      /*******  纵向模板 ******/
+      /*******  横向向模板 ******/
       hr: {
           // 横向模板相关固有属性
           tmpUrl: "",
@@ -43,7 +49,10 @@ const state = {
           ex: 0,
           ey: 0,
           selW: 0,
-          selH: 0
+          selH: 0,
+          // 当前模板对应的真实的尺寸
+          realW: dftImgRealSize.h,
+          realH: dftImgRealSize.w,
       }
   },
   step2: {
@@ -83,7 +92,8 @@ const mutations = {
   },
   set_step1_lng(state, {type, val}){
       if(type == 'tmpUrl'){
-          state.step1.lng.tmpUrl = val
+          state.step1.lng.tmpUrl = url.resolve('http://localhost:9080',val);
+          console.log(state.step1.lng.tmpUrl);
       }else if (type == 'tmpW') {
           state.step1.lng.tmpW = val
       }else if (type == 'tmpH') {
@@ -104,11 +114,14 @@ const mutations = {
           state.step1.lng.selW = val
       }else if (type == 'selH') {
           state.step1.lng.selH = val
+      }else if(type == 'realsize') {
+          state.step1.lng.realW = val.w;
+          state.step1.lng.realH = val.h;
       }
   },
   set_step1_hr(state, {type, val}){
       if(type == 'tmpUrl'){
-          state.step1.hr.tmpUrl = val
+        state.step1.hr.tmpUrl = url.resolve('http://localhost:9080', val);
       }else if (type == 'tmpW') {
           state.step1.hr.tmpW = val
       }else if (type == 'tmpH') {
@@ -129,6 +142,9 @@ const mutations = {
           state.step1.hr.selW = val
       }else if (type == 'selH') {
           state.step1.hr.selH = val
+      }else if(type == 'realsize') {
+          state.step1.hr.realW = val.h;
+          state.step1.hr.realH = val.w;
       }
   },
   set_step2_filter(state, {type, val}) {

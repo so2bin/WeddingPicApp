@@ -24,7 +24,7 @@
                 </div>
             </div>
         </div>
-        <input type="button" name="" value="下载" @click="download">
+        <input type="button" name="" value="打印" @click="printing">
         <input type="button" name="" value="暂停" @click="stop">
     </div>
 </template>
@@ -105,12 +105,16 @@ let mkdirp = require('mkdirp')
                     if(type == 'print'){
                         let str = data.fullPath + ' ' + data.fileName + ' ' + (succ? 1:0);
                         fs.writeFile(this.printhistory, str, {'flags': 'a'}, (err)=>{
-                            console.error('log print history error: ', err)
+                            if(err){
+                                console.error('log print history error: ', err)
+                            }
                         });
                     }else if (type == 'upload') {
                         let str = data.fullPath + ' ' + data.fileName + ' ' + (succ? 1:0);
                         fs.writeFile(this.uploadhistory, str, {'flags': 'a'}, (err)=>{
-                            console.error('log upload history error: ', err)
+                            if(err){
+                                console.error('log upload history error: ', err)
+                            }
                         });
                     }
                 }
@@ -196,7 +200,7 @@ let mkdirp = require('mkdirp')
                     }
                 });
             },
-            download() {
+            printing() {
                 this.begainPrinting()
             },
             stop(){
@@ -247,8 +251,14 @@ let mkdirp = require('mkdirp')
                 if(this.imgPrePrintQueue.length > 0){
                     let curPrintImg = this.imgPrePrintQueue[0];
                     if(curPrintImg){
-                        return this.$http.get(this.PRINTHOST
-                            +'/printImg?imgUrl='+curPrintImg.fullPath)
+                        let params = {
+                            imgUrl: curPrintImg.fullPath,
+                            template: {
+                                lng: this.$store.state.ProNew.step1.lng,
+                                hr: this.$store.state.ProNew.step1.hr
+                            }
+                        }
+                        return this.$http.post(this.PRINTHOST+'/printImg', params);
                     }
                 }
                 return false;

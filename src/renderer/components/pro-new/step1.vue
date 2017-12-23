@@ -348,6 +348,9 @@ export default {
         tmpLst(){
             return this.$store.state.Tmplst.tmpLst.lng;
         },
+        tmpRealSize(){
+            return this.$store.state.Tmplst.tmpRealSize;
+        },
         imgRateLst(){
             return this.$store.state.Tmplst.imgRate;
         },
@@ -371,7 +374,8 @@ export default {
                 return this.$store.state.ProCnf.tmp.lng.url;
             },
             set(val) {
-                this.$store.commit('set_cnf_tmp_url', {type: 'lng', val})
+                this.$store.commit('set_cnf_tmp_url', {type: 'lng', val});
+                this.$store.commit('set_step1_lng', {type: 'tmpUrl', val});
             }
         },
         confTmpHrUrl: {
@@ -379,7 +383,8 @@ export default {
                 return this.$store.state.ProCnf.tmp.hr.url;
             },
             set(val) {
-                this.$store.commit('set_cnf_tmp_url', {type: 'hr', val})
+                this.$store.commit('set_cnf_tmp_url', {type: 'hr', val});
+                this.$store.commit('set_step1_hr', {type: 'tmpUrl', val});
             }
         },
     },
@@ -549,6 +554,8 @@ export default {
             this.bMosDown = false;
             this.elx = this.getCX(e);
             this.ely = this.getScaleCYWithCX(e, 'lng');
+            this.selLW = Math.abs(this.slx - this.elx);
+            this.selLH = Math.abs(this.sly - this.ely);
             this.drawSelRect('lng');
         },
         cmosDownH(e){
@@ -583,6 +590,8 @@ export default {
             this.bMosDown = false;
             this.ehx = this.getCX(e);
             this.ehy = this.getScaleCYWithCX(e, 'hr');
+            this.selHW = Math.abs(this.shx - this.ehx);
+            this.selHH = Math.abs(this.shy - this.ehy);
             this.drawSelRect('hr');
         },
         /*****   其它  ******/
@@ -593,6 +602,10 @@ export default {
             this.tmpLH = curTmp.showH;
             this.tmpHW = curTmp.showH;
             this.tmpHH = curTmp.showW;
+            this.$store.commit('set_step1_lng', {type: 'realsize',
+                val:this.tmpRealSize[idx]});
+            this.$store.commit('set_step1_hr', {type: 'realsize',
+                val: this.tmpRealSize[idx]});
         },
         // 选择照片比例
         imgRateChanged(idx){

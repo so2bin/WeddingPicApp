@@ -48,7 +48,7 @@
             this.$store.commit('set_pronew', {type, val})
         },
         clickNew(e){
-            
+            this.step = 1;
         },
       handleOpen (key, keyPath) {
         console.log('5555', key, keyPath)

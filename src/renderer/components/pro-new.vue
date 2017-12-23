@@ -15,7 +15,6 @@
         <router-view class="view">
             <span slot='test'>
                 <div class="but-group" style="text-align:center;">
-                    <el-button @click.native.prevent="handlePreview" v-show="preview" size='mini'>预览</el-button>
                     <el-button @click.native.prevent="handlePreStep" v-show="preStep" size='mini'>上一步</el-button>
                     <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary" size='mini'>下一步</el-button>
                     <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary" size='mini'>发布</el-button>
@@ -33,14 +32,25 @@ export default {
   data: function () {
     return {
         isRouter: false,
-        preview: false,
         preStep: false,
         nextStep: true,
         publish: false,
-        step: 1,
     }
   },
+  computed: {
+      step: {
+          get (){
+              return this.$store.state.ProNew.step;
+          },
+          set(val){
+              this.set_proj('step', val);
+          }
+      }
+  },
   methods: {
+      set_proj(type, val){
+          this.$store.commit('set_pronew', {type, val})
+      },
     handlePreview: function () {
       console.log('预览')
     },
@@ -53,11 +63,13 @@ export default {
       }, 500)
     },
     handleNextStep: function () {
-      this.$router.push('/pronew/step' + (this.step + 1))
-      if (this.isRouter) {
-          this.step++;
+      this.$router.push('/pronew/step' + (this.step + 1));
+      // if (this.isRouter) {
+        if(this.step + 1 < 6){
+            this.step++;
+        }
           this.goStep(this.step)
-      }
+      // }
       $('html,body').animate({
         scrollTop: 0
       }, 100)
@@ -68,25 +80,21 @@ export default {
     goStep: function (n) {
       switch (n) {
         case 1:
-          this.preview = false;
           this.preStep = false;
           this.nextStep = true;
           this.publish = false;
           break
         case 2:
-          this.preview = false;
           this.preStep = true;
           this.nextStep = true;
           this.publish = false;
           break
         case 3:
-          this.preview = false;
           this.preStep = true;
           this.nextStep = true;
           this.publish = false;
           break
         case 4:
-          this.preview = false;
           this.preStep = true;
           this.nextStep = true;
           this.publish = false;
@@ -104,13 +112,18 @@ export default {
           this.publish = true;
           break
       }
-    }
+    },
+  },
+  beforeRouteEnter (to, from, next) {
+      next(vm => {
+          vm.step = 1;
+      })
   },
   watch: {
     '$route': function (to, from) {
       this.isRouter = true;
     }
-  }
+  },
 }
 </script>
 

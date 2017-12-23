@@ -4,6 +4,8 @@ let dftTmpHr = tmplst.default.state.tmpLst.hr[0];
 let dftImgRate = tmplst.default.state.imgRate[0];
 
 const state = {
+  // 当前步骤
+  step: 1,
   step1: {
       // 项目名称
       proName: "",
@@ -63,6 +65,11 @@ const state = {
 }
 
 const mutations = {
+  set_pronew(state, {type, val}){
+      if(type == 'step'){
+          state.step = val
+      }
+  },
   set_pro_info(state, {type, val}){
       if(type == 'proname'){
           state.step1.proName = val;
@@ -70,6 +77,8 @@ const mutations = {
           state.step1.proSizeIdx = val;
       }else if(type == 'proimgidx'){
           state.step1.proImgSizeIdx = val;
+      }else if(type == 'step'){
+          state.step1.step = val;
       }
   },
   set_step1_lng(state, {type, val}){

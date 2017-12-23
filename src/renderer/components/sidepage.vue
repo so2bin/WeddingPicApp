@@ -17,7 +17,7 @@
               <i class="el-icon-star-on"></i>
               <span slot="title" class="router-nav">首页</span>
             </el-menu-item>
-            <el-menu-item index="/pronew" style="padding-left:10px;" >
+            <el-menu-item index="/pronew" style="padding-left:10px;" @click.native="clickNew">
               <i class="el-icon-circle-plus-outline"></i>
               <span slot="title" class="router-nav">新建</span>
             </el-menu-item>
@@ -33,9 +33,25 @@
 
 <script>
   export default {
+      computed: {
+          step: {
+              get (){
+                  return this.$store.state.ProNew.step;
+              },
+              set(val){
+                  this.set_proj('step', val);
+              }
+          }
+      },
     methods: {
+        set_proj(type, val){
+            this.$store.commit('set_pronew', {type, val})
+        },
+        clickNew(e){
+            
+        },
       handleOpen (key, keyPath) {
-        console.log(key, keyPath)
+        console.log('5555', key, keyPath)
       },
       handleClose (key, keyPath) {
         console.log(key, keyPath)

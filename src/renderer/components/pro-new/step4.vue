@@ -18,12 +18,12 @@
             </span>
             <input type="file" id="imgFolderCopy" webkitdirectory directory  style="display:none"
              @change="change_folder">
-            <input type="text" name="" value="" :value="imgfldr_copy">
+            <input type="text" name="" value="" :value="imgfldr_backend">
             <label for="imgFolderCopy">
               <img src="/static/img/icons/folder.svg" alt="">
             </label>
           </div>
-          <div class="img-folders">
+          <!-- <div class="img-folders">
             <span class="img-folders-item">
               合成目录：
             </span>
@@ -33,7 +33,7 @@
             <label for="imgFolderComposed">
               <img src="/static/img/icons/folder.svg" alt="">
             </label>
-          </div>
+          </div> -->
         </div>
         <div class="step4-main-lower">
           <div class="main-lower-tips">
@@ -45,26 +45,22 @@
               {{ prntr.printerName }}
             </el-checkbox>
           </div>
-          <!-- <div class="print-btn">
-              <el-button @click.native="gotoPrint" size="mini" :loading="bPrinting">自动打印</el-button>
-          </div> -->
-          <!-- <div class="steps-control"> -->
-              <slot name='test'></slot>
-          <!-- </div> -->
+          <slot name='test'></slot>
         </div>
     </div>
 </template>
 
 <script lang="">
 import { ipcRenderer } from 'electron'
+let fs = require('fs');
+let path = require('path');
 
     export default {
       data () {
         return {
           PRINTHOST: 'http://127.0.0.1:7010',
           printerLst: [],
-          checkedLst: [],
-          bPrinting: false
+          checkedLst: []
         }
       },
       computed: {
@@ -77,6 +73,14 @@ import { ipcRenderer } from 'electron'
                   this.set_imgfldr_path('origin', val)
               }
           },
+          imgfldr_backend: {
+              get() {
+                  return this.$store.state.ProNew.step4.imgfldr_backend
+              },
+              set(val) {
+                  this.set_imgfldr_path('backend', val)
+              }
+          },
           imgfldr_copy: {
               get() {
                   return this.$store.state.ProNew.step4.imgfldr_copy
@@ -85,12 +89,12 @@ import { ipcRenderer } from 'electron'
                   this.set_imgfldr_path('copy', val)
               }
           },
-          imgfldr_composed: {
+          imgfldr_beauty: {
               get() {
-                  return this.$store.state.ProNew.step4.imgfldr_composed
+                  return this.$store.state.ProNew.step4.imgfldr_beauty
               },
               set(val) {
-                  this.set_imgfldr_path('composed', val)
+                  this.set_imgfldr_path('beauty', val)
               }
           },
       },
@@ -112,17 +116,6 @@ import { ipcRenderer } from 'electron'
         checked (index) {
           this.checkedLst[index] = !this.checkedLst[index]
         },
-        gotoPrint () {
-            this.bPrinting = true
-            this.$http.get(this.PRINTHOST + '/printImg?imgUrl=' + 'C:/Users/HELIBB/Desktop/test2.jpg')
-                .then((res) => {
-                    this.bPrinting = false
-                })
-                .catch((err) => {
-                    console.error(err);
-                    this.bPrinting = false
-                })
-        },
         getPrinterList() {
             this.$http.get(this.PRINTHOST + '/printerLst')
                 .then((res) => {
@@ -134,7 +127,40 @@ import { ipcRenderer } from 'electron'
         },
         set_imgfldr_path(type, val) {
             this.$store.commit('set_step4_imgfldr', {type, val})
-        }
+        },
+        // 在备份目录下建立子目录
+        cre_backend_folders(){
+            if(this.imgfldr_backend){
+                let copySubFldr = path.join(this.imgfldr_backend, 'copy');
+                let beautySubFldr = path.join(this.imgfldr_backend, 'beauty');
+                fs.exists(copySubFldr, (exist) => {
+                    if(!exist){
+                        fs.mkdir(copySubFldr, (err)=>{
+                            if(err){
+                                console.error(err);
+                            }else{
+                                this.imgfldr_copy = copySubFldr;
+                            }
+                        });
+                    }else{
+                        this.imgfldr_copy = copySubFldr;
+                    }
+                });
+                fs.exists(beautySubFldr, (exist) => {
+                    if(!exist){
+                        fs.mkdir(beautySubFldr, (err) => {
+                            if(err){
+                                console.error(err);
+                            }else{
+                                this.imgfldr_beauty = beautySubFldr;
+                            }
+                        });
+                    }else{
+                        this.imgfldr_beauty = beautySubFldr;
+                    }
+                });
+            }
+        },
       },
       created() {
         // ipcRenderer.send('ipc-printer-list', true);
@@ -146,7 +172,11 @@ import { ipcRenderer } from 'electron'
         //   });
         // })
         this.getPrinterList()
-      }
+    },
+      beforeRouteLeave (to, from, next) {
+          this.cre_backend_folders();
+          next();
+      },
     }
 </script>
 

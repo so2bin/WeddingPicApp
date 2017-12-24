@@ -13,15 +13,15 @@
             text-color="#455667"
             active-text-color="#f94239"
             router>
-            <el-menu-item index="/bodypage" style="padding-left:10px;">
+            <el-menu-item index="/bodypage" style="padding-left:5px;">
               <i class="el-icon-star-on"></i>
               <span slot="title" class="router-nav">首页</span>
             </el-menu-item>
-            <el-menu-item index="/pronew" style="padding-left:10px;" @click.native="clickNew">
+            <el-menu-item index="/pronew" style="padding-left:5px;" @click.native="clickNew">
               <i class="el-icon-circle-plus-outline"></i>
               <span slot="title" class="router-nav">新建</span>
             </el-menu-item>
-            <el-menu-item index="/help" style="padding-left:10px;">
+            <el-menu-item index="/help" style="padding-left:5px;">
               <i class="el-icon-question"></i>
               <span slot="title" class="router-nav">关于</span>
             </el-menu-item>
@@ -62,11 +62,11 @@
 
 <style lang="" scoped>
     .el-menu-item {
-        width: 100px;
-        min-width: 100px;
+        width: 80px;
+        min-width: 80px;
     }
     .el-submenu__title {
-        padding-left: -50px !important;
+        padding-left: -0px !important;
     }
     .nav-tip > p {
         font-weight: bold;
@@ -78,7 +78,8 @@
         text-decoration: none;
         font-size: 18px;
         font-weight: bold;
-        /*color: #455667;*/
+        position: relative;
+        left: -8px;
     }
 
 </style>

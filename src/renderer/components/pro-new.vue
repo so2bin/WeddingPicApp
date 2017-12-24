@@ -17,7 +17,7 @@
                 <div class="but-group" style="text-align:center;">
                     <el-button @click.native.prevent="handlePreStep" v-show="preStep" size='mini'>上一步</el-button>
                     <el-button @click.native.prevent="handleNextStep" v-show="nextStep" type="primary" size='mini'>下一步</el-button>
-                    <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary" size='mini'>发布</el-button>
+                    <el-button @click.native.prevent="handlePublish" v-show="publish" type="primary" size='mini'>创建</el-button>
                 </div>
             </span>
         </router-view>
@@ -75,7 +75,7 @@ export default {
       }, 100)
     },
     handlePublish: function () {
-      console.log('发布')
+      this.$router.push('/work');
     },
     goStep: function (n) {
       switch (n) {
@@ -102,15 +102,15 @@ export default {
         case 5:
           this.preview = false;
           this.preStep = true;
-          this.nextStep = true;
-          this.publish = false;
-          break
-        case 6:
-          this.preview = true;
-          this.preStep = true;
           this.nextStep = false;
           this.publish = true;
           break
+        // case 6:
+        //   this.preview = true;
+        //   this.preStep = true;
+        //   this.nextStep = false;
+        //   this.publish = true;
+        //   break
       }
     },
   },

@@ -38,6 +38,11 @@ export default new Router({
       ]
     },
     {
+      path: '/work',
+      name: 'work',
+      component: require('@/components/work').default
+    },
+    {
       path: '/help',
       name: 'help',
       component: require('@/components/help').default

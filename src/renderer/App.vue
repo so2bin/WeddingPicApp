@@ -1,11 +1,11 @@
 <template>
 <div id="app">
     <el-container style="height: 100%;">
-        <el-aside width="100px">
+        <el-aside width="80px">
             <sidepage></sidepage>
         </el-aside>
         <el-container>
-            <el-header>
+            <el-header style="height:50px;">
                 <headpage></headpage>
             </el-header>
             <el-main>
@@ -43,7 +43,7 @@ export default {
     background-color: #B3C0D1;
     color: #333;
     text-align: center;
-    line-height: 60px;
+    line-height: 50px;
 }
 
 .el-aside {

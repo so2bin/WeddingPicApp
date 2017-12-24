@@ -1,6 +1,6 @@
 <template lang="">
-    <div class="step6">
-        <div class="step6-main">
+    <div class="work">
+        <div class="work-main">
             <div class="main-before-process-list">
                 <!-- D:\照片\通信研究生毕业合照（大合照+各班合照） -->
                 <!-- <span class="befor-process-img-small">
@@ -8,19 +8,34 @@
                 </span> -->
                 <div class="befor-process-img-small">
                     <img :src="curShowImg" alt="">
+                    <div class="process-img-setting">
+                        <div style="float:left; margin-left:20px;">编号 0001</div>
+                        <div class="">
+                            <span>打印张数</span>
+                            <input type="number" name="张数" value="" v-model.number="curPrntNum">
+                        </div>
+
+                    </div>
                 </div>
             </div>
             <div class="main-printing-list">
-                <div class="printing-list-elem"
-                :class="{printed: item.bUsed}"
-                v-for="(item, idx) in imgPrePrintQueue">
-                    {{ item.fileName }}
+                <div class="pre-printing-list">
+                    <div class="printing-list-elem"
+                    :class="{printed: item.bUsed}"
+                    v-for="(item, idx) in imgPrePrintQueue">
+                        {{ item.fileName }}
+                    </div>
                 </div>
-                <div style="height:5px; width:100%; background-color:#666;"></div>
-                <div class="printing-list-elem"
-                :class="{printed: item.bUsed}"
-                v-for="(item, idx) in imgPrintedQueue">
-                    {{ item.fileName }}
+                <div style="height:5px; width:100%; background-color:#abb6d0;"></div>
+                <div class="printed-list">
+                    <div class="printing-list-elem"
+                    :class="{printed: item.bUsed}"
+                    v-for="(item, idx) in imgPrintedQueue">
+                        {{ item.fileName }}
+                    </div>
+                </div>
+                <div class="print-oper" v-show="bSelPrintElem">
+                    测试操作
                 </div>
             </div>
         </div>
@@ -35,6 +50,7 @@ let path = require('path')
 import { ipcRenderer } from 'electron'
 import fx from 'glfx'
 let mkdirp = require('mkdirp')
+import {dbs} from '../../tools/ndb'
 
     //判断当前字符串是否以str结束
     if (typeof String.prototype.endsWith != 'function') {
@@ -46,12 +62,13 @@ let mkdirp = require('mkdirp')
     export default {
         data() {
             return {
+                proName: this.$store.state.ProNew.step1.proName,
                 imgfldrOrigin: this.$store.state.ProNew.step4.imgfldr_origin,
                 imgfldrCopy: this.$store.state.ProNew.step4.imgfldr_copy,
                 imgfldrBeauty: this.$store.state.ProNew.step4.imgfldr_beauty,
                 imglstOrigin: [],  // time orderd queue, FIFO
                 imglstCopy: [],
-                imglstComposed: [],
+                imglstBeauty: [],
                 imgPrePrintQueue: [], // 待打印队列
                 imgPrintedQueue: [],  // 已打印队列
                 preImgMap: new Map(), // 待打印队列对应Map
@@ -63,9 +80,27 @@ let mkdirp = require('mkdirp')
                 // 标记是否连续美化照片函数正在运行（打印、上传过程都可能会触发改函数，而只需要一个地方调用即可）
                 bInBeautyStatus: false,
                 curBtyImgNo: '0000',  // 起始图片编号
+                // 打印
+                prntNum: 1,
+                bSelPrintElem: false,
             }
         },
         computed: {
+            cdb (){
+                return dbs.getdb(this.$store.state.ProNew.step1.proName);
+            },
+            curPrntNum: {
+                get (){
+                    return this.prntNum
+                },
+                set(val){
+                    if(val <=0 ){
+                        this.prntNum = 1
+                    }else{
+                        this.prntNum = val
+                    }
+                }
+            },
             curShowImg() {
                 return this.imglstOrigin.length>0? this.imglstOrigin[0].fullPath:"";
             },
@@ -86,75 +121,64 @@ let mkdirp = require('mkdirp')
             }
         },
         methods: {
-            // 在copy目录中生成两文件，分别保存当前目录里面的照片的
-            // 打印历史（printhistory.txt）与上传历史（upload.txt）
+            // 检查目录
             auto_cre_file(){
+                if(!fs.existsSync(this.imgfldrOrigin)){
+                    mkdirp.sync(this.imgfldrOrigin)
+                }
                 if(!fs.existsSync(this.imgfldrCopy)){
                     mkdirp.sync(this.imgfldrCopy)
                 }
-                if(!fs.existsSync(this.imgfldrComposed)){
-                    mkdirp.sync(this.imgfldrComposed)
-                }
-                if(!fs.existsSync(this.printhistory)){
-                    fs.writeFile(this.printhistory, "");
-                }
-                if(!fs.existsSync(this.uploadhistory)){
-                    fs.writeFile(this.uploadhistory, "");
-                }
-            },
-            // 往历史文件中记录数据
-            logHistory(type, data, succ){
-                if(data){
-                    if(type == 'print'){
-                        let str = data.fullPath + ' ' + data.fileName + ' ' + (succ? 1:0);
-                        fs.writeFile(this.printhistory, str, {'flags': 'a'}, (err)=>{
-                            if(err){
-                                console.error('log print history error: ', err)
-                            }
-                        });
-                    }else if (type == 'upload') {
-                        let str = data.fullPath + ' ' + data.fileName + ' ' + (succ? 1:0);
-                        fs.writeFile(this.uploadhistory, str, {'flags': 'a'}, (err)=>{
-                            if(err){
-                                console.error('log upload history error: ', err)
-                            }
-                        });
-                    }
+                if(!fs.existsSync(this.imgfldrBeauty)){
+                    mkdirp.sync(this.imgfldrBeauty)
                 }
             },
             creOriginImgsTimer() {
                 if(!this.imgProcessTimer){
-                    if(this.imgfldrOrigin || this.imgfldrCopy){
+                    if(this.imgfldrOrigin || this.imgfldrBeauty){
                         this.imgProcessTimer = window.setInterval(this.getImgsLists, 3000);
                         // 立刻执行一次
                         this.getImgsLists();
                     }
                 }
             },
+            // promise化
             getImgsInFolder(folder, target){
                 if(folder){
                     let stat = fs.statSync(folder);
                     if(stat && stat.isDirectory()){
-                        fs.readdir(folder, (err, files) => {
-                            let imglst = [];
-                            files.forEach((file) => {
-                                let fpath = path.join(folder, file)
-                                let obj = fs.statSync(fpath)
-                                if(obj && obj.isFile() && !fpath.endsWith('.txt')){
-                                    imglst.push({
-                                        'fullPath': fpath,
-                                        'bUsed': false,
-                                        'fileName': file
-                                    });
+                        return new Promise((resolve, reject)=>{
+                            fs.readdir(folder, (err, files) => {
+                                if(err){
+                                    reject(err);
                                 }
+                                let imglst = [];
+                                files.forEach((file) => {
+                                    let fpath = path.join(folder, file)
+                                    let obj = fs.statSync(fpath)
+                                    if(obj && obj.isFile() && !fpath.endsWith('.txt')){
+                                        imglst.push({
+                                            'fullPath': fpath,
+                                            'fileName': file
+                                        });
+                                    }
+                                })
+                                if(target == 'origin'){
+                                    this.imglstOrigin = imglst;
+                                }else if (target == 'beauty') {
+                                    this.imglstBeauty = imglst
+                                }
+                                resolve();
                             })
-                            if(target == 'origin'){
-                                this.imglstOrigin = imglst;
-                            }else if (target == 'copy') {
-                                this.imglstCopy = imglst
-                            }
                         })
                     }
+                }
+            },
+            // 根据队列同步 对应的map
+            initImgMap(queue, imgMap){
+                imgMap.clear();
+                for(let img in queue){
+                    imgMap.set(img.fileName, img);
                 }
             },
             // 维护历史队列
@@ -167,9 +191,10 @@ let mkdirp = require('mkdirp')
                 };
             },
             // 获取图片列表: 原始图片（待处理），处理后图片（待打印）
-            getImgsLists() {
-                this.getImgsInFolder(this.imgfldrOrigin, 'origin');
-                this.getImgsInFolder(this.imgfldrCopy, 'copy');
+            getImgsLists: async function() {
+                await this.getImgsInFolder(this.imgfldrOrigin, 'origin');
+                await this.getImgsInFolder(this.imgfldrBeauty, 'beauty');
+                console.log(this.imgPrePrintQueue, this.imglstCopy);
                 // 待打印与待上传队列的维护
                 this.updateQueue(this.preImgMap, this.historyImgMap, this.imgPrePrintQueue, this.imglstCopy);
             },
@@ -208,8 +233,8 @@ let mkdirp = require('mkdirp')
                     if(curBtyImg){
                         return this.$http.post(this.PRINTHOST+'/enhanceImg', {
                             "originAddr": curBtyImg.fullPath,
-                            "targetAddr": this.imgfldrCopy,
-                            "moveToAddr": this.imgfldrComposed,
+                            "targetAddr": this.imgfldrBeauty,
+                            "moveToAddr": this.imgfldrCopy,
                             "brightness":0.5,
                             "contrast":10,
                             "saveStartNo":this.curBtyImgNo
@@ -219,7 +244,7 @@ let mkdirp = require('mkdirp')
                 return false;
             },
             // beauty once
-            beautyImgOnce: async function() {
+            beautyImgOnce: async function(doc) {
                 this.bInBeautyStatus = true;
                 try{
                     let res = await this.callBeauty();
@@ -230,7 +255,8 @@ let mkdirp = require('mkdirp')
                         throw new Error(res.data.msg)
                     }else{
                         this.imglstOrigin.shift();
-                        this.curBtyImgNo = res.data.imgNo[res.data.imgNo.length-1]
+                        this.curBtyImgNo = res.data.imgNo[res.data.imgNo.length-1];
+                        this.setDB(doc, {no: this.curBtyImgNo})
                     }
                 }catch(err){
                     console.error(err);  // 改为弹框提示
@@ -258,7 +284,7 @@ let mkdirp = require('mkdirp')
                 }
                 return false;
             },
-            printImgOnce: async function(){
+            printImgOnce: async function(doc){
                 try{
                     let res = await this.callPrint();
                     if(!res){
@@ -268,10 +294,14 @@ let mkdirp = require('mkdirp')
                         throw new Error(res.data.msg)
                     }else{
                         let printedImg = this.imgPrePrintQueue.shift();
-                        this.logHistory('print', printedImg, true);
-                        printedImg.bUsed = true;
+                        this.preImgMap.delete(printedImg.fileName);
                         this.imgPrintedQueue.push(printedImg);
-                        this.preImgMap.set(printedImg.fileName, printedImg)
+                        this.historyImgMap.set(printedImg.fileName, printedImg);
+                        this.pushDBQueue({
+                            fullPath: printedImg.fullPath,
+                            fileName: printedImg.fileName,
+                            logtime: new Date()
+                        })
                     }
                 }catch(err){
                     console.error(err);
@@ -297,8 +327,9 @@ let mkdirp = require('mkdirp')
             },
             // 每次只美化一张并打印一张
             beautyAndPrintOnce: async function(){
-                let bs = await this.beautyImgOnce();
-                let ps = await this.printImgOnce();
+                let doc = this.getDBPrintedQueue();
+                let bs = await this.beautyImgOnce(doc);
+                let ps = await this.printImgOnce(doc);
             },
             startPrintingTimer(){
                 if(!this.imgPrintingTimer){
@@ -317,11 +348,89 @@ let mkdirp = require('mkdirp')
             begainPrinting() {
                 this.startPrintingTimer();
             },
+            //  本地数据库中获取打印历史记录
+            getDBPrintedQueue(){
+                return new Promise((resolve, reject)=>{
+                    this.cdb.findOne({name: this.proName}, (err, doc)=>{
+                        if(err){
+                            console.error(err);
+                            resolve(null);
+                        }else{
+                            resolve(doc);
+                        }
+                    })
+                })
+            },
+            // update 本地数据库中的历史打印记录
+            setDB(doc, setObj){
+                return new Promise((resolve, reject)=>{
+                    this.cdb.update({_id: doc._id}, {$set: setObj},
+                        { upsert: true }, (err, numAffected)=>{
+                        if(err){
+                            console.error(err);
+                            resolve(0);
+                        }else{
+                            resolve(numAffected);
+                        }
+                    })
+                })
+            },
+            pushDBQueue(doc, obj){
+                return new Promise((resolve, reject)=>{
+                    this.cdb.update({_id: doc._id}, {$push: {queue: obj}},
+                        {}, (err, numAffected)=>{
+                            if(err){
+                                console.error(err);
+                                resolve(0);
+                            }else{
+                                resolve(numAffected);
+                            }
+                        })
+                })
+            },
+            // 进入组件时，根据本地数据库，初始化打印历史记录, 同时删除不存在文件夹中的图片的历史记录
+            initPrintedQueue: async function(){
+                let doc = await this.getDBPrintedQueue();
+                if(!doc){
+                    return;
+                }else{
+                    // 获取当前beauty文件夹中的图片列表，并全部放到preprintMap中
+                    await this.getImgsInFolder(this.imgfldrBeauty, 'beauty');
+                    initImgMap(this.imglstBeauty, this.preImgMap);
+                    // 根据历史记录数据，获取待打印列表与已打印列表，同时删除DB历史记录中已经不存在的文件
+                    let newQueue = []
+                    for(let itm of doc.queue){
+                        let obj = this.preImgMap.get(itm.fileName);
+                        // 已打印
+                        if(obj){
+                            this.historyImgMap.set(obj.fileName, obj)
+                            this.preImgMap.delete(obj.fileName);
+                            newQueue.push(obj);
+                        }else{  // 否则就是历史记录中的文件已经删除
+
+                        }
+                    }
+                    doc.queue = newQueue;
+                    this.setDB(doc, {queue: doc.queue});
+                    console.log(this.preImgMap, this.historyImgMap);
+                }
+            },
+            // 根据本地数据库获取当前的起始图片编号
+            initNextNo: async function(){
+                let doc = await this.getDBPrintedQueue();
+                if(!doc){
+                    return;
+                }else{
+                    this.curBtyImgNo = doc.no;
+                }
+            },
         },
         beforeRouteEnter (to, from, next) {
             next(vm => {
-                vm.creOriginImgsTimer();
                 vm.auto_cre_file();
+                vm.initPrintedQueue();
+                vm.creOriginImgsTimer();
+                vm.initNextNo();
             })
         },
         beforeRouteLeave (to, from, next) {
@@ -335,29 +444,58 @@ let mkdirp = require('mkdirp')
 </script>
 
 <style lang="" scoped>
-.step6 {
-    padding: 10px 0px;
-    height: 450px;
+.work {
+    padding: 0px 0px;
+    min-height: 540px;
+    height: 100%;
 }
-.step6-main {
+.work-main {
     width: 100%;
-    height: 400px;
+    height: 100%;
+    min-height: 540px;
     display: inline-block;
 }
 .main-before-process-list{
     width: 60%;
-    height: 100%;
+    height: 400px;
+    min-height: 360px;
+    min-width: 500px;
     border: 1px solid #677084;
-    padding: 5px 5px;
-    overflow-y: scroll;
+    padding: 0px 0px;
+    /* overflow-y: scroll; */
     float: left;
+    position: relative;
+}
+.befor-process-img-small{
+    min-height: 360px;
+    min-width: 500px;
+    height: 360px;
+}
+.befor-process-img-small > img{
+    width: 100%;
+    height: 100%;
+    padding-top: 0px;
+    padding-left:0px;
+    display: inline;
+}
+.process-img-setting > div {
+    display: inline-block;
+    line-height: 40px;
+    font-size: 15px;
+}
+.process-img-setting input[name='张数'] {
+    line-height: 30px;
+    height: 30px;
+    width: 40px;
+    text-align: center;
 }
 .main-printing-list{
     margin-left: 3px;
     width: 20%;
-    height: 100%;
+    height: 400px;
     border: 1px solid #677084;
     float: left;
+    position: relative;
 }
 .printing-list-elem{
     padding-left: 1px;
@@ -374,15 +512,15 @@ let mkdirp = require('mkdirp')
 .printed{
     background-color: rgba(3, 197, 25, 0.63);
 }
-.befor-process-img-small{
-
+.pre-printing-list{
+    height: 50%;
 }
-.befor-process-img-small > img{
+.printed-list{
+    height: 50%;
+}
+.print-oper{
+    position: absolute;
+    bottom: -30px;
     width: 100%;
-    height: 100%;
-    padding-top: 3px;
-    padding-left: 3px;
-    display: inline-block;
 }
-
 </style>

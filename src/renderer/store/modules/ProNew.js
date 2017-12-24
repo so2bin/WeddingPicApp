@@ -69,9 +69,10 @@ const state = {
     pro_company_addr: ''
   },
   step4: {
-      imgfldr_origin: 'D:\\Node\\Imgs\\origin',
-      imgfldr_copy: 'D:\\Node\\Imgs\\copy',
-      imgfldr_composed: 'D:\\Node\\Imgs\\composed'
+      imgfldr_origin: 'D:\\Node\\Imgs\\origin',  // 原始照片路径
+      imgfldr_backend: "D:\\Node\\Imgs\\copy",  // 备份数据目录
+      imgfldr_copy: '', // 备份照片子目录
+      imgfldr_beauty: ''  // 美化照片子目录
   }
 }
 
@@ -177,8 +178,10 @@ const mutations = {
           state.step4.imgfldr_origin = val
       } else if (type == 'copy'){
           state.step4.imgfldr_copy = val
-      } else if (type == 'composed'){
-          state.step4.imgfldr_composed = val
+      } else if (type == 'backend'){
+          state.step4.imgfldr_backend = val
+      } else if (type == 'beauty'){
+          state.step4.imgfldr_beauty = val
       }
   }
 }

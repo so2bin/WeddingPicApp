@@ -1,5 +1,5 @@
 <template lang="">
-    <div class="header">
+    <div class="header" style="-webkit-app-region: drag;">
         头部
     </div>
 </template>

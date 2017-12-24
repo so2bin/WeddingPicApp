@@ -21,10 +21,17 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 563,
-    useContentSize: true,
+    height: 620,
     width: 1000,
-    webPreferences: {webSecurity: false} // 加上这个就可以获取到了本地的图片
+    minWidth: 1000,
+    minHeight: 580,
+    useContentSize: true,
+    webPreferences: {webSecurity: false}, // 加上这个就可以获取到了本地的图片
+    // frame: false,  // 无边框
+    show: true,
+    backgroundColor: '#e9eef3',
+    // icon: "",    // 图标
+    titleBarStyle: 'hiddenInset',
   })
 
   mainWindow.loadURL(winURL)

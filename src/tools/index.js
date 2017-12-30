@@ -14,12 +14,23 @@ export let funcs = ()=>{
   //   });
   //    event.sender.send('ipc-printer-list', prntrs);
   // })
-  // let db = dbs.getdb('default');
+  let db = dbs.getdb('test');
   // db.insert({'name': 'hello world'}, (err, newDoc)=>{
   //     if(err){
   //         console.error(err);
   //     }
   // })
+  // db.update({name: 'test'}, {$set: {No: "555"}},
+  //   { upsert: true }, (err, numAffected)=>{
+  //       if(err){
+  //           console.error(err);
+  //       }else{
+  //           console.log('111 ', numAffected);
+  //       }
+  //   })
+  //       db.findOne({name: 'test'}, (err, doc)=>{
+  //           console.log(doc, err);
+  //       })
 }
 
 

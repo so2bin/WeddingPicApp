@@ -99,7 +99,6 @@ const mutations = {
   set_step1_lng(state, {type, val}){
       if(type == 'tmpUrl'){
           state.step1.lng.tmpUrl = url.resolve('http://localhost:9080',val);
-          console.log(state.step1.lng.tmpUrl);
       }else if (type == 'tmpW') {
           state.step1.lng.tmpW = val
       }else if (type == 'tmpH') {

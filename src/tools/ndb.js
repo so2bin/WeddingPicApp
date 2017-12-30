@@ -18,7 +18,7 @@ class NDB {
         this.db = null;
     }
     init(){
-        this.db = new Datastore({filename: this.filename});
+        this.db = new Datastore({filename: this.filename, autoload: true});
         this.db.loadDatabase();
     }
 }

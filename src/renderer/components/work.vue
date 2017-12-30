@@ -244,7 +244,7 @@ import {dbs} from '../../tools/ndb'
             // 根据队列同步 对应的map
             initImgMap(queue, imgMap){
                 imgMap.clear();
-                for(let img in queue){
+                for(let img of queue){
                     imgMap.set(img.fileName, img);
                 }
             },

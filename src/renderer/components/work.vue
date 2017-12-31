@@ -41,7 +41,7 @@
                 <div class="print-oper" v-show="bSelPrintElem">
                     <div class="reprint-elem" v-on:mouseenter="showReprint" v-on:mouseleave="displayReprint"
                         @click="doReprint">
-                        <label for="imgFolderOrigin">
+                        <label for="">
                           <img src="/static/img/icons/reset.svg" alt="">
                         </label>
                         <span class="reprint-tips" v-show="bShowReprint">

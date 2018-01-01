@@ -28,6 +28,22 @@
 <script lang="">
 import $ from 'jquery';
 import {config} from '../../conf'
+const COS = require('cos-nodejs-sdk-v5');
+
+// let cos = new COS({
+//     AppId: config.APPID,
+//     SecretId: config.SecretId,
+//     SecretKey: config.SecretKey
+// });
+
+// cos.sliceUploadFile({
+//     Bucket: config.Bucket,
+//     Region: 'ap-guangzhou',
+//     Key: '0001.png',
+//     FilePath: 'D:\\Node\\WeddingPicApp\\static\\img\\QR.jpg'
+// }, (err, data)=>{
+//     console.log('1111 ', err, data);
+// })
 
 export default {
   name: 'pro-new',

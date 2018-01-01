@@ -3,13 +3,14 @@
     <h2 class="help-title">朝歌婚姻相册系统<span style="font-size:16px;">v1.0</span></h2>
     <div class="pic-show">
         <el-row style="height:200px;">
-            <el-col style="line-height:18px;" :span="10" v-for="(item, idx) in datalist" :key="idx" :offset="idx > 0 ? 2 : 0">
+            <el-col style="line-height:18px;" :span="10" v-for="(item, idx) in suiteList"
+                :key="idx" :offset="idx > 0 ? 2 : 0">
                 <el-card :body-style="{ padding: '0px' }">
-                    <img :src="item.imgDemoUrl" class="image">
+                    <img :src="item.main_img" class="image">
                     <div style="padding: 14px;">
-                        <span>好吃的汉堡</span>
+                        <span>{{ item.title }}</span>
                         <div class="bottom clearfix">
-                            <time class="time">{{ currentDate }}</time>
+                            <time class="time">{{ item.create_time }}</time>
                             <el-button type="text" class="button">操作按钮</el-button>
                         </div>
                     </div>
@@ -22,15 +23,71 @@
 
 <script lang="">
 export default {
-  data () {
-    return {
-      currentDate: new Date(),
-      datalist: [
-        {imgDemoUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'},
-        {imgDemoUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'}
-      ]
+    data () {
+        return {
+            hasInternet: false,
+            DOMAIN: this.$store.state.conf.DOMAIN,
+            API_TEST: this.$store.state.conf.API_TEST,
+            SUITE_LIST: this.$store.state.conf.SUITE_LIST,
+            datalist: [
+                {imgDemoUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'},
+                {imgDemoUrl: 'http://www.twgreatdaily.com/imgs/image/105/10588367.jpg'}
+            ],
+            suiteMap: new Map(), // 维护suiteList的id=>idx的映射
+            /* {title, main_img, head_img, img_num, like_num,
+                 favor_num, creator, beautor, create_time}
+            */
+            suiteList: []
+        }
+    },
+    computed: {
+
+    },
+    methods: {
+        // 测试能否连接服务器
+        testInternet(){
+            return this.$http.get(this.API_TEST)
+                .then(res=>{
+                    this.hasInternet = true;
+                })
+                .catch((err)=>{
+                    this.hasInternet = false;
+                })
+        },
+        // update from remote server
+        updateSuiteListFromServer(){
+            if(!this.hasInternet){
+                return false;
+            }
+            this.$http.get(this.SUITE_LIST)
+                .then((res)=>{
+                    if(res.data.status){
+                        throw new Error(res.msg);
+                    }
+                    let items = res.data.data;
+                    for(let itm of items){
+                        if(suiteMap.has(itm.id)){
+                            // 对比更新数据并保存
+                        }else{
+                            // 增加新数据并保存
+                            this.suiteList.append(itm);
+                            this.suiteMap.set(itm.id, this.suiteList.length);
+                        }
+                    }
+                })
+                .catch((err)=>{
+
+                })
+        },
+    },
+    created: async function(){
+        await this.testInternet();
+    },
+    mounted(){
+        setTimeout(()=>{
+            this.updateSuiteListFromServer();
+        }, 1000)
     }
-  }
 }
 </script>
 

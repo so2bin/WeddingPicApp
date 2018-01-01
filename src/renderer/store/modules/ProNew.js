@@ -66,7 +66,9 @@ const state = {
     pro_author: '',
     pro_phone: '',
     pro_company: '',
-    pro_company_addr: ''
+    pro_company_addr: '',
+    main_img: "",
+    head_img: ""
   },
   step4: {
       imgfldr_origin: 'D:\\Node\\Imgs\\origin',  // 原始照片路径

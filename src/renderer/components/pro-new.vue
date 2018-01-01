@@ -26,7 +26,9 @@
 </template>
 
 <script lang="">
-import $ from 'jquery'
+import $ from 'jquery';
+import {config} from '../../conf'
+
 export default {
   name: 'pro-new',
   data: function () {
@@ -35,6 +37,16 @@ export default {
         preStep: false,
         nextStep: true,
         publish: false,
+
+        DOMAIN: this.$store.state.conf.DOMAIN,
+        SUITE_CREATE: this.$store.state.conf.SUITE_CREATE,
+        suiteObj: {
+            title: this.$store.state.ProNew.step1.proName,
+            main_img: this.$store.state.ProNew.step3.main_img,
+            head_img: this.$store.state.ProNew.step3.head_img,
+            suite_type: 0,
+        },
+        HTTP_RE: /^http:\/\/.+/,
     }
   },
   computed: {
@@ -74,8 +86,49 @@ export default {
         scrollTop: 0
       }, 100)
     },
-    handlePublish: function () {
-      this.$router.push('/work');
+    // 检查图片本地图片还是网络图片
+    testHttpImg(imgUrl){
+        let imgAddr = imgUrl.replace(/^\s+/, '');
+        if(this.HTTP_RE.test(imgAddr)){
+            return true;
+        }else{
+            return false;
+        }
+    },
+    // 获取图片url，如果是本地则先上传再返回
+    uploadImg: async function(imgUrl){
+        if(!this.testHttpImg(imgUrl)){
+            // 上传照片
+        }else{
+            return imgUrl;
+        }
+    },
+    createSuite(data){
+        return this.$http.post(this.SUITE_CREATE, data)
+            .then((res)=>{
+                let response = res.data;
+                if(response.status){
+                    throw new Error(response.msg);
+                }else{
+                    // success
+                    console.log('创建相册成功 ', response.data);
+                }
+            })
+            .catch((err)=>{
+                console.error(err);
+            })
+    },
+    // 创建相册并上传模板图
+    handlePublish: async function () {
+        let main_img = await this.uploadImg(this.suiteOjb.main_img);
+        let head_img = await this.uploadImg(this.suiteOjb.head_img);
+        await this.createSuite({
+            title: this.suiteObj.title,
+            main_img: main_img,
+            head_img: head_img,
+            suite_type: this.suiteObj.suite_type
+        });
+        this.$router.push('/work');
     },
     goStep: function (n) {
       switch (n) {

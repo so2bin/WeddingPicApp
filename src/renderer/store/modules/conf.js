@@ -14,10 +14,16 @@ const state = {
     /*** 服务器路由信息  **/
     DOMAIN,
     HOST,
+
+    API_TEST: `${HOST}/api/test/`,
+
     LOGINUP: `${HOST}/userinfo/validate/login-up/`,
     SENDVALIDCODE: `${HOST}/userinfo/validate/code/`,
     LOGIN: `${HOST}/userinfo/validate/login/`,
     LOGOUT: `${HOST}/userinfo/validate/login-out/`,
+
+    SUITE_CREATE: `${HOST}/suite/create/`,
+    SUITE_LIST: `${HOST}/suite/list/`,
 }
 
 const mutations = {

@@ -6,6 +6,12 @@ const DOMAIN = 'localhost'
 const HOST = `http://${DOMAIN}:8000`;
 
 const state = {
+    /** 本地用户信息 cookie  */
+    DAY_COOKIE_EFECITVIE: 14,    // 本地用户信息cookie有效时间天数
+    USER_URL: `http://${DOMAIN}`,
+    USER_COOKIE_NAME: 'user',
+
+    /*** 服务器路由信息  **/
     DOMAIN,
     HOST,
     LOGINUP: `${HOST}/userinfo/validate/login-up/`,

@@ -1,11 +1,15 @@
 <template lang="">
     <div class="header" style="-webkit-app-region: drag;">
         <div class="account-img">
-            <img src="/static/img/icons/account.svg" alt="" @click="openLogin"
-                v-on:mouseenter="showAcctTipsToggle(true)" v-on:mouseleave="showAcctTipsToggle(false)">
-            <div class="account-tips" v-show="bShowAccountTips || bFixAccountTips">
+            <img src="/static/img/icons/account.svg" alt="" @click="openLoginedTips" />
+                <!-- v-on:mouseenter="showAcctTipsToggle(true)" v-on:mouseleave="showAcctTipsToggle(false)"> -->
+            <div class="account-tips" v-show="bShowAccountTips && isLogined">
                 <div class="" id="log-out" @click="logout">
                     <span>退出登陆</span>
+                </div>
+                <div class="">
+                    <span>昵称：{{ nickname }}</span>
+                    <span>帐号：{{ phone }}</span>
                 </div>
             </div>
         </div>
@@ -32,6 +36,11 @@
                         密码 -->
                         <el-input placeholder="密码" prefix-icon="el-icon-view"
                             v-model="passwd" size="medium" :minlength="6" clearable>
+                        </el-input>
+                    </div>
+                    <div class="loginup-row">
+                        <el-input placeholder="昵称" prefix-icon="el-icon-view"
+                            v-model="nickname" size="medium" :maxlength="8" clearable>
                         </el-input>
                     </div>
                     <div class="loginup-row">
@@ -91,12 +100,15 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                     useRegister: false,
                     useLogin: false
                 },
+                id: "",
                 phone: "",
                 passwd: "",
-                code: "",
+                code: "",  // 验证码
+                nickname: "",
                 logupClicked: false,
                 loginClicked: false,
                 logoutClicked: false,
+                USER_COOKIE_NAME: this.$store.state.conf.USER_COOKIE_NAME,
                 DOMAIN: this.$store.state.conf.DOMAIN,
                 LOGINUP: this.$store.state.conf.LOGINUP,
                 LOGIN: this.$store.state.conf.LOGIN,
@@ -109,17 +121,35 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                 codeCounter: "",   // 验证码60s计数器
             }
         },
+        computed: {
+            user: {
+                get(){
+                    return this.$store.state.user;
+                }
+            }
+        },
         methods: {
+            set_user(user) {
+                this.$store.commit('set_user_data', {type: 'id', val: user.id});
+                this.$store.commit('set_user_data', {type: 'phone', val: user.phone});
+                this.$store.commit('set_user_data', {type: 'nickname', val: user.nickname});
+                this.id = user.id; this.phone = user.phone; this.nickname = user.nickname;
+            },
+            clear_user(){
+                this.id = ""; this.phone=""; this.nickname="";
+                this.$store.commit('clear_user');
+            },
             showAcctTipsToggle(val){
                 if(this.isLogined){
                     this.bShowAccountTips = val;
                 }
             },
-            openLogin(){
+            openLoginedTips(){
                 if(!this.isLogined){
                     this.bShowLogin = !this.bShowLogin;
+                }else{
+                    this.bShowAccountTips = !this.bShowAccountTips;
                 }
-                this.bFixAccountTips = !this.bFixAccountTips;
             },
             goRegister(){
                 this.loginCtl.useMain = false;
@@ -149,14 +179,34 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                 this.$http.post(this.LOGINUP, {
                     phone: this.phone,
                     code: this.code,
-                    password: this.passwd
+                    password: this.passwd,
+                    nickname: this.nickname
                 })
                 .then((res)=>{
-                    let data = res.data
+                    let data = res.data;
                     if(data.status){
-                        console.error(data.msg);
+                        throw new Error(data.msg);
                     }
+                    return data.data;
+                })
+                // 登陆
+                .then((user)=>{
+                    return this.$http.post(this.LOGIN, {
+                        phone: this.phone,
+                        password: this.passwd
+                    })
+                })
+                .then((res)=>{
                     this.logupClicked = false;
+                    let data = res.data;
+                    if(data.status){
+                        throw new Error(data.msg);
+                    }else{
+                        this.isLogined = true;
+                        let user = data.data;
+                        this.set_user(user);
+                        this.closeLogin(0);
+                    }
                 })
                 .catch((err)=>{
                     console.log(err);
@@ -206,52 +256,130 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                     password: this.passwd
                 })
                 .then((res)=>{
-                    let data = res.data
-                    if(data.status){
-                        console.error(data.msg);
-                    }
                     this.loginClicked = false;
-                    this.isLogined = true;
+                    let data = res.data;
+                    if(data.status){
+                        throw new Error(data.msg);
+                    }else{
+                        this.isLogined = true;
+                        this.bShowLogin = false;
+                        let user = data.data;
+                        this.set_user(user);
+                    }
                 })
                 .catch((err)=>{
-                    console.log(err);
+                    console.err(err);
                     this.loginClicked = false;
                 })
             },
             // 登出
             logout(e){
-                console.log(this.isLogined);
                 if(!this.isLogined || this.logoutClicked){
                     return;
                 }
                 this.logoutClicked = true;
                 this.$http.get(this.LOGOUT)
                 .then((res)=>{
-                    let data = res.data
+                    this.logoutClicked = false;
+                    let data = res.data;
                     if(data.status){
                         console.error(data.msg);
+                    }else{
+                        this.isLogined = false;
+                        this.bShowAccountTips = false;
+                        this.clear_user();
                     }
-                    this.logoutClicked = false;
-                    this.isLogined = false;
                 })
                 .catch((err)=>{
-                    console.log(err);
+                    console.err(err);
                     this.logoutClicked = false;
+                })
+            },
+            // 从cookie中初始化用户信息
+            initUserInfoFromCookie(){
+                return new Promise((resolve, reject)=>{
+                    ses.cookies.get({
+                        'domain': this.DOMAIN, 'name': this.USER_COOKIE_NAME
+                    }, (err, cookies)=>{
+                        if(err){
+                            reject(err);
+                        }
+                        if(cookies && cookies.length > 0){
+                            let user = cookies[0].value;
+                            if(user){
+                                user = JSON.parse(user);
+                                this.id = user.id;
+                                this.phone = user.phone;
+                                this.nickname = user.nickname;
+                                resolve(true);
+                            }
+                        }
+                        resolve(false);
+                    })
+                })
+            },
+            // get login cookie history when start app
+            initGetLoginCookie(){
+                return new Promise((resolve, reject)=>{
+                    ses.cookies.get({'domain': this.DOMAIN, 'name': 'sessionid'},(err, cookies)=>{
+                        if(err){
+                            reject(err);
+                        }
+                        if(cookies && cookies.length > 0){
+                            resolve(cookies[0]);
+                        }else{
+                            resolve(null);
+                        }
+                    })
+                })
+            },
+            // 同步执行登陆判断
+            syncMounted: async function() {
+                // 是否已登陆
+                let oldCookie = await this.initGetLoginCookie();
+                if(oldCookie){
+                    this.isLogined = true;
+                    this.initUserInfoFromCookie();
+                }else{
+                    this.isLogined = false;
+                }
+            },
+            // 异步执行登陆判断
+            asyncMounted(){
+                ses.cookies.get({'domain': this.DOMAIN, 'name': 'sessionid'},(err, cookies)=>{
+                    if(err){
+                        console.error(err);
+                    }
+                    if(cookies && cookies.length > 0){
+                        ses.cookies.get({
+                            'domain': this.DOMAIN, 'name': this.USER_COOKIE_NAME
+                        }, (err, userCookies)=>{
+                            if(err){
+                                console.error(err);
+                            }
+                            if(userCookies && userCookies.length > 0){
+                                let user = userCookies[0].value;
+                                if(user){
+                                    user = JSON.parse(user);
+                                    this.id = user.id;
+                                    this.phone = user.phone;
+                                    this.nickname = user.nickname;
+
+                                    this.isLogined = true;
+                                }
+                            }
+                        })
+                    }else{
+                        this.isLogined = false;
+                    }
                 })
             },
         },
         updated () {
 
         },
-        created () {
-            // 是否已登陆
-            ses.cookies.get({'domain': this.DOMAIN, 'name': 'sessionid'},(err, cookies)=>{
-                if(cookies && cookies.length > 0){
-                    this.isLogined = true;
-                }else{
-                    this.isLogined = false;
-                }
-            });
+        mounted() {
+            this.asyncMounted();
         },
     }
 </script>

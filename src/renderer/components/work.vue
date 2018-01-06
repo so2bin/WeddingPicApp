@@ -53,6 +53,7 @@
         </div>
         <input type="button" name="" value="打印" @click="printing">
         <input type="button" name="" value="暂停" @click="stop">
+        <input type="button" name="" value="上传" @click="upload">
     </div>
 </template>
 
@@ -63,6 +64,8 @@ import { ipcRenderer } from 'electron'
 import fx from 'glfx'
 let mkdirp = require('mkdirp')
 import {dbs} from '../../tools/ndb'
+import {UUFile} from '../../tools/uufile'
+const COS = require('../../tools/cos');
 
     //判断当前字符串是否以str结束
     if (typeof String.prototype.endsWith != 'function') {
@@ -104,6 +107,11 @@ import {dbs} from '../../tools/ndb'
         computed: {
             cdb (){
                 return dbs.getdb(this.$store.state.ProNew.step1.proName);
+            },
+            user: {
+                get(){
+                    return this.$store.state.user;
+                }
             },
             curPrntNum: {
                 get (){
@@ -536,6 +544,25 @@ import {dbs} from '../../tools/ndb'
                 }else{
                     this.curBtyImgNo = doc.No;
                 }
+            },
+            // 开始上传
+            upload(){
+                this.testCOS();
+            },
+            testCOS(){
+                let fp = 'D:\\Node\\Imgs\\0001.jpg';
+                // COS.deleteObject('MTAw&MTA=&151517029450200013483', (err, data)=>{
+                //     console.log('delete: ', err, data);
+                // })
+                ipcRenderer.send('ipc-upload-img', {
+                    userId: this.user.id,
+                    suiteId: this.$route.params.suiteId,
+                    imgUrl: fp,
+                    code: '0001',
+                })
+                ipcRenderer.on('ipc-upload-img', (event, arg)=>{
+                    console.log('ret from ipc: ', arg); // {url, key}
+                })
             },
         },
         beforeRouteEnter (to, from, next) {

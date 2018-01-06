@@ -27,23 +27,10 @@
 
 <script lang="">
 import $ from 'jquery';
-import {config} from '../../conf'
-const COS = require('cos-nodejs-sdk-v5');
-
-// let cos = new COS({
-//     AppId: config.APPID,
-//     SecretId: config.SecretId,
-//     SecretKey: config.SecretKey
-// });
-
-// cos.sliceUploadFile({
-//     Bucket: config.Bucket,
-//     Region: 'ap-guangzhou',
-//     Key: '0001.png',
-//     FilePath: 'D:\\Node\\WeddingPicApp\\static\\img\\QR.jpg'
-// }, (err, data)=>{
-//     console.log('1111 ', err, data);
-// })
+const ses = require('electron').remote.getCurrentWebContents().session;
+import { ipcRenderer } from 'electron'
+import {uploadImg, uploadToSOC} from '../../tools/uploadimg'
+import {randomInt} from '../../tools/uufile'
 
 export default {
   name: 'pro-new',
@@ -56,16 +43,22 @@ export default {
 
         DOMAIN: this.$store.state.conf.DOMAIN,
         SUITE_CREATE: this.$store.state.conf.SUITE_CREATE,
-        suiteObj: {
-            title: this.$store.state.ProNew.step1.proName,
-            main_img: this.$store.state.ProNew.step3.main_img,
-            head_img: this.$store.state.ProNew.step3.head_img,
-            suite_type: 0,
-        },
+        BACKIMG_SUITEID: this.$store.state.conf.BACKIMG_SUITEID,
         HTTP_RE: /^http:\/\/.+/,
     }
   },
   computed: {
+      suiteObj() {
+          return {
+              title: this.$store.state.ProNew.step1.proName,
+              main_img: this.$store.state.ProNew.step3.main_img,
+              head_img: this.$store.state.ProNew.step3.head_img,
+              suite_type: 0,
+          }
+      },
+      csrftoken(){
+          return this.$store.state.user.csrftoken;
+      },
       step: {
           get (){
               return this.$store.state.ProNew.step;
@@ -73,12 +66,36 @@ export default {
           set(val){
               this.set_proj('step', val);
           }
+      },
+      user: {
+          get(){
+              return this.$store.state.user;
+          }
       }
   },
   methods: {
-      set_proj(type, val){
-          this.$store.commit('set_pronew', {type, val})
-      },
+    // 获取csrf
+    initCsrf: async function(){
+        await new Promise((resolve, reject)=>{
+            ses.cookies.get({
+                domain: this.DOMAIN, name: 'csrftoken'
+            }, (err, cookies)=>{
+                if(err){
+                    reject(err);
+                }
+                if(cookies && cookies.length > 0){
+                    let csrf = cookies[0].value;
+                    this.$store.commit('set_csrf', csrf);
+                    resolve(csrf);
+                }else{
+                    resolve(null);
+                }
+            })
+        });
+    },
+    set_proj(type, val){
+        this.$store.commit('set_pronew', {type, val})
+    },
     handlePreview: function () {
       console.log('预览')
     },
@@ -115,12 +132,21 @@ export default {
     uploadImg: async function(imgUrl){
         if(!this.testHttpImg(imgUrl)){
             // 上传照片
+            let ret = await uploadToSOC(this.user.id, this.BACKIMG_SUITEID, imgUrl, randomInt());
+            return ret.url;
         }else{
             return imgUrl;
         }
     },
     createSuite(data){
-        return this.$http.post(this.SUITE_CREATE, data)
+        return this.$http({
+            method: 'POST',
+            url: this.SUITE_CREATE,
+            headers: {
+                'X-CSRFToken': this.csrftoken,
+            },
+            data: data
+        })
             .then((res)=>{
                 let response = res.data;
                 if(response.status){
@@ -128,23 +154,40 @@ export default {
                 }else{
                     // success
                     console.log('创建相册成功 ', response.data);
+                    return response.data;
                 }
             })
             .catch((err)=>{
-                console.error(err);
+                console.error('相册创建失败：', err);
+                return null;
             })
     },
     // 创建相册并上传模板图
     handlePublish: async function () {
-        let main_img = await this.uploadImg(this.suiteOjb.main_img);
-        let head_img = await this.uploadImg(this.suiteOjb.head_img);
-        await this.createSuite({
+        if(!this.user.id){
+            console.error('请先登陆');
+        }
+        if(!(this.suiteObj.main_img && this.suiteObj.head_img)){
+            console.error('背景模板不能为空！');
+            return;
+        }
+        let main_img = await this.uploadImg(this.suiteObj.main_img);
+        let head_img = await this.uploadImg(this.suiteObj.head_img);
+        let ret = await this.createSuite({
             title: this.suiteObj.title,
             main_img: main_img,
             head_img: head_img,
             suite_type: this.suiteObj.suite_type
         });
-        this.$router.push('/work');
+        this.$router.push({
+            name: 'work',
+            params: {
+                suiteId: ret.id,
+                title: ret.title,
+                main_img: ret.main_img,
+                head_img: ret.head_img,
+            }
+        });
     },
     goStep: function (n) {
       switch (n) {
@@ -186,6 +229,7 @@ export default {
   beforeRouteEnter (to, from, next) {
       next(vm => {
           vm.step = 1;
+          vm.initCsrf();
       })
   },
   watch: {

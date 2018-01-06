@@ -4,35 +4,12 @@ let fs = require('fs');
 // let NDB = require('./ndb');
 let ipcMain = electron.ipcMain;
 import {dbs} from './ndb'
-export let funcs = ()=>{
-  // printer events
-  // ipcMain.on('ipc-printer-list', (event, arg)=>{
-  //   let prntlst = printer.getPrinters();
-  //   let prntrs = []
-  //   prntlst.forEach(elem => {
-  //     prntrs.push(elem.name);
-  //   });
-  //    event.sender.send('ipc-printer-list', prntrs);
-  // })
-  let db = dbs.getdb('test');
-  // db.insert({'name': 'hello world'}, (err, newDoc)=>{
-  //     if(err){
-  //         console.error(err);
-  //     }
-  // })
-  // db.update({name: 'test'}, {$set: {No: "555"}},
-  //   { upsert: true }, (err, numAffected)=>{
-  //       if(err){
-  //           console.error(err);
-  //       }else{
-  //           console.log('111 ', numAffected);
-  //       }
-  //   })
-  //       db.findOne({name: 'test'}, (err, doc)=>{
-  //           console.log(doc, err);
-  //       })
-}
+import {uploadImg} from './uploadimg'
 
+// APP启动时在主进程里运行该函数
+export let funcs = ()=>{
+  uploadImg();
+}
 
 // module.exports.saveBase64 = ()=>{
 //     ipcMain.on('ipc-savebase64', (event, arg)=>{
@@ -49,3 +26,5 @@ export let funcs = ()=>{
 //         });
 //     })
 // }
+
+/***************************************************************/

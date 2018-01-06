@@ -129,6 +129,14 @@ const ses = require('electron').remote.getCurrentWebContents().session;
             }
         },
         methods: {
+            // 由session的数据初始化全局用户信息
+            init_user(user){
+                this.$store.commit('init_logined_user_data', {type: 'id', val: user.id});
+                this.$store.commit('init_logined_user_data', {type: 'phone', val: user.phone});
+                this.$store.commit('init_logined_user_data', {type: 'nickname', val: user.nickname});
+                this.id = user.id; this.phone = user.phone; this.nickname = user.nickname;
+            },
+            // 设置用户信息，并保存到session
             set_user(user) {
                 this.$store.commit('set_user_data', {type: 'id', val: user.id});
                 this.$store.commit('set_user_data', {type: 'phone', val: user.phone});
@@ -308,9 +316,7 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                             let user = cookies[0].value;
                             if(user){
                                 user = JSON.parse(user);
-                                this.id = user.id;
-                                this.phone = user.phone;
-                                this.nickname = user.nickname;
+                                this.init_user(user);
                                 resolve(true);
                             }
                         }
@@ -361,10 +367,7 @@ const ses = require('electron').remote.getCurrentWebContents().session;
                                 let user = userCookies[0].value;
                                 if(user){
                                     user = JSON.parse(user);
-                                    this.id = user.id;
-                                    this.phone = user.phone;
-                                    this.nickname = user.nickname;
-
+                                    this.init_user(user);
                                     this.isLogined = true;
                                 }
                             }

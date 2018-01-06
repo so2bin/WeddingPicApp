@@ -56,22 +56,28 @@ export default {
   props: ['pro_obj'],
   data () {
     return {
-      bkimg: '/static/img/背景图片2.jpg',
       bLoaded: false
     }
   },
   computed: {
     isBkImgLoaded () {
       return this.bkimg && this.bkimg !== '' && this.bLoaded
+    },
+    bkimg: {
+        get(){
+            return this.$store.state.ProNew.step3.head_img;
+        },
+        set(val){
+            this.$store.commit('set_step3_pro', {type: 'head_img', val});
+        }
     }
   },
   methods: {
     sel_bkImg () {
-      let img = event.currentTarget.files[0]
-      console.log(img.path)
-      this.bkimg = img.path
+      let img = event.currentTarget.files[0];
       if (img.path && img.path !== '') {
-        this.bLoaded = true
+        this.bLoaded = true;
+        this.bkimg = img.path;
       } else {
         this.bLoaded = false
       }

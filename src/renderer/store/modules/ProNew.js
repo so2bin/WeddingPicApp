@@ -5,6 +5,9 @@ let dftTmpLng = tmplst.default.state.tmpLst.lng[0];
 let dftTmpHr = tmplst.default.state.tmpLst.hr[0];
 let dftImgRate = tmplst.default.state.imgRate[0];
 let dftImgRealSize = tmplst.default.state.tmpRealSize[0];
+const path = require('path');
+const DEF_MAIN_IMG = '/static/img/背景图片1.jpg';
+const DEF_HEAD_IMG = '/static/img/背景图片2.jpg';
 
 const state = {
   // 当前步骤
@@ -67,8 +70,8 @@ const state = {
     pro_phone: '',
     pro_company: '',
     pro_company_addr: '',
-    main_img: "",
-    head_img: ""
+    main_img: DEF_MAIN_IMG,
+    head_img: DEF_HEAD_IMG,
   },
   step4: {
       imgfldr_origin: 'D:\\Node\\Imgs\\origin',  // 原始照片路径
@@ -172,6 +175,12 @@ const mutations = {
       state.step3.pro_company = val
     } else if (type == 'company_addr') {
       state.step3.pro_company_addr = val
+    } else if (type == 'main_img') {
+      val = val || DEF_MAIN_IMG;
+      state.step3.main_img = val
+    } else if (type == 'head_img') {
+      val = val || DEF_HEAD_IMG;
+      state.step3.head_img = val
     }
   },
   set_step4_imgfldr (state, {type, val}) {

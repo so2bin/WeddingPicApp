@@ -11,6 +11,9 @@ const state = {
     USER_URL: `http://${DOMAIN}`,
     USER_COOKIE_NAME: 'user',
 
+    /* 相册模板上传时的suiteid */
+    BACKIMG_SUITEID: 0,
+    
     /*** 服务器路由信息  **/
     DOMAIN,
     HOST,
@@ -24,6 +27,7 @@ const state = {
 
     SUITE_CREATE: `${HOST}/suite/create/`,
     SUITE_LIST: `${HOST}/suite/list/`,
+    PIC_UPLOAD: `${HOST}/suite/upload_pic/`,
 }
 
 const mutations = {

@@ -6,7 +6,7 @@
             <el-col style="line-height:18px;" :span="10" v-for="(item, idx) in suiteList"
                 :key="idx" :offset="idx > 0 ? 2 : 0">
                 <el-card :body-style="{ padding: '0px' }">
-                    <img :src="item.main_img" class="image">
+                    <img :src="item.main_img" class="image" style="height:200px;">
                     <div style="padding: 14px;">
                         <span>{{ item.title }}</span>
                         <div class="bottom clearfix">
@@ -66,17 +66,17 @@ export default {
                     }
                     let items = res.data.data;
                     for(let itm of items){
-                        if(suiteMap.has(itm.id)){
+                        if(this.suiteMap.has(itm.id)){
                             // 对比更新数据并保存
                         }else{
                             // 增加新数据并保存
-                            this.suiteList.append(itm);
-                            this.suiteMap.set(itm.id, this.suiteList.length);
+                            this.suiteList.push(itm);
+                            this.suiteMap.set(itm.id, this.suiteList.length-1);
                         }
                     }
                 })
                 .catch((err)=>{
-
+                    console.error(err);
                 })
         },
     },

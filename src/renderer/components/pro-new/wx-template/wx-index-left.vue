@@ -17,22 +17,28 @@ export default {
   },
   data () {
     return {
-      bkimg: '/static/img/背景图片1.jpg',
       bLoaded: false
     }
   },
   computed: {
     isBkImgLoaded () {
       return this.bkimg && this.bkimg !== '' && this.bLoaded
-    }
+    },
+    bkimg: {
+        get(){
+            return this.$store.state.ProNew.step3.main_img;
+        },
+        set(val){
+            this.$store.commit('set_step3_pro', {type: 'main_img', val});
+        }
+    },
   },
   // props: ['bkimg'],
   methods: {
     sel_bkImg () {
-      let img = event.currentTarget.files[0]
-      console.log(img.path)
-      this.bkimg = img.path
+      let img = event.currentTarget.files[0];
       if (img.path && img.path !== '') {
+        this.bkimg = img.path;
         this.bLoaded = true
       } else {
         this.bLoaded = false
